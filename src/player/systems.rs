@@ -3,6 +3,8 @@ use bevy::prelude::*;
 use crate::collision::components::{Collider, Solid};
 use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
 use crate::player::components::Player;
+use crate::world::elevation::height_fn::HeightFn;
+use crate::world::elevation::slope::slope_speed_multiplier;
 
 pub fn setup_player(mut commands: Commands) {
     commands.spawn((
@@ -23,6 +25,7 @@ pub fn setup_player(mut commands: Commands) {
 pub fn move_player(
     time: Res<Time>,
     keyboard: Res<ButtonInput<KeyCode>>,
+    height: Res<HeightFn>,
     mut query: Query<&mut Transform, With<Player>>,
 ) {
     let mut direction = Vec2::ZERO;
@@ -40,8 +43,11 @@ pub fn move_player(
     }
 
     if direction != Vec2::ZERO {
-        let delta = direction.normalize() * PLAYER_SPEED * time.delta_secs();
+        let dir = direction.normalize();
         for mut transform in &mut query {
+            let grad = height.gradient(transform.translation.xy());
+            let slope_mul = slope_speed_multiplier(dir, grad);
+            let delta = dir * PLAYER_SPEED * slope_mul * time.delta_secs();
             transform.translation.x += delta.x;
             transform.translation.y += delta.y;
         }

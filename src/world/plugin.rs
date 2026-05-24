@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::world::systems::spawn_bounds;
+use crate::world::wall::spawn_bounds;
 
 pub struct WorldPlugin;
 
