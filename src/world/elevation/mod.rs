@@ -1,7 +1,12 @@
+pub mod chunk_coord;
 pub mod components;
+pub mod contour_data;
+pub mod contour_extract;
+pub mod contour_levels;
+pub mod contour_mesh;
+pub mod contour_style;
 pub mod height_fn;
 pub mod marching;
-pub mod mesh_build;
 pub mod plugin;
 pub mod resources;
 pub mod slope;

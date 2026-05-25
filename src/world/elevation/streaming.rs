@@ -4,9 +4,13 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use crate::constants::{CHUNK_VIEW_MARGIN, ELEVATION_CELL, ELEV_CHUNK_CELLS};
-use crate::world::elevation::components::ElevationChunk;
+use crate::world::elevation::chunk_coord::chunk_origin_world;
+use crate::world::elevation::components::{ContourGeometry, ElevationChunk};
+use crate::world::elevation::contour_extract::extract_contours;
+use crate::world::elevation::contour_levels::ContourLevels;
+use crate::world::elevation::contour_mesh::contour_lines_to_mesh;
+use crate::world::elevation::contour_style::ContourStyle;
 use crate::world::elevation::height_fn::HeightFn;
-use crate::world::elevation::mesh_build::{build_chunk_mesh, chunk_origin_world};
 use crate::world::elevation::resources::LoadedChunks;
 
 pub fn update_visible_chunks(
@@ -15,6 +19,8 @@ pub fn update_visible_chunks(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut loaded: ResMut<LoadedChunks>,
     height: Res<HeightFn>,
+    levels: Res<ContourLevels>,
+    style: Res<ContourStyle>,
     camera: Single<&Transform, With<Camera2d>>,
     window: Single<&Window, With<PrimaryWindow>>,
 ) {
@@ -40,7 +46,8 @@ pub fn update_visible_chunks(
         if loaded.0.contains_key(coord) {
             continue;
         }
-        let mesh = build_chunk_mesh(*coord, &height);
+        let lines = extract_contours(*coord, &height, &levels.0);
+        let mesh = contour_lines_to_mesh(&lines, &style);
         let mesh_handle = meshes.add(mesh);
         let mat_handle = materials.add(ColorMaterial::from(Color::WHITE));
         let origin = chunk_origin_world(*coord);
@@ -50,6 +57,7 @@ pub fn update_visible_chunks(
                 MeshMaterial2d(mat_handle),
                 Transform::from_xyz(origin.x, origin.y, 0.1),
                 ElevationChunk,
+                ContourGeometry { lines },
             ))
             .id();
         loaded.0.insert(*coord, entity);
