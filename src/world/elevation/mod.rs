@@ -9,5 +9,4 @@ pub mod height_fn;
 pub mod marching;
 pub mod plugin;
 pub mod resources;
-pub mod slope;
 pub mod streaming;

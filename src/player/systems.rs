@@ -4,7 +4,7 @@ use crate::collision::components::{Collider, Solid};
 use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
 use crate::player::components::Player;
 use crate::world::elevation::height_fn::HeightFn;
-use crate::world::elevation::slope::slope_speed_multiplier;
+use crate::world::terrain_effects::slope_speed::slope_speed_multiplier;
 
 pub fn setup_player(mut commands: Commands) {
     commands.spawn((

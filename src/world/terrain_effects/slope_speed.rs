@@ -1,6 +1,8 @@
 use bevy::math::Vec2;
 
-use crate::constants::{SLOPE_SPEED_K, SLOPE_SPEED_MAX, SLOPE_SPEED_MIN};
+const SLOPE_SPEED_K: f32 = 0.6;
+const SLOPE_SPEED_MIN: f32 = 0.2;
+const SLOPE_SPEED_MAX: f32 = 1.5;
 
 #[must_use]
 pub fn slope_speed_multiplier(dir: Vec2, gradient: Vec2) -> f32 {
