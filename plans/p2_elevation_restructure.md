@@ -177,3 +177,76 @@ sibling `constants.rs` for that module. Only put it in
 5. Step 5 (constants audit) — falls out of the above; final pass.
 
 Each step ends with `cargo check` clean and the game still running.
+
+---
+
+## STATUS — 2026-05-27: all five steps shipped
+
+All five steps landed. `cargo check` clean. Per-module `constants.rs`
+files now own all tuning constants; `src/constants.rs` deleted.
+
+### Final elevation layout
+
+```
+src/world/elevation/
+  chunk_coord.rs       chunk_events.rs    chunk_lifecycle.rs
+  chunk_view.rs        components.rs      constants.rs
+  height_fn.rs         loaded_chunks.rs   mod.rs           plugin.rs
+  contour/   data.rs extract.rs levels.rs marching.rs
+             mesh.rs render.rs  style.rs  mod.rs
+  noise/     fbm.rs  value_noise.rs       mod.rs
+```
+
+---
+
+## Known weaknesses in the new lifecycle (revisit when 2nd consumer lands)
+
+The current design works because `contour_render` is the *only*
+`ChunkLoaded` consumer. Each of these will bite as soon as a second one
+(pathfinding, physics, audio) shows up.
+
+### 1. `LoadedChunks` has no per-chunk readiness state
+
+`LoadedChunks: HashMap<IVec2, Entity>` only tracks "spawned." A consumer
+reacting to `ChunkLoaded` may take frames to finish its work (e.g.
+pathfinding bake). During that window, anything querying
+`LoadedChunks` sees the chunk as "loaded" but its data isn't ready.
+
+**Fix when needed:** marker components on the chunk entity
+(`PathfindingBaked`, `ContourRendered`) that consumers query — or
+upgrade the map value to `enum { Spawning, Ready }`. Don't pre-build.
+
+### 2. `.chain()` in `ElevationPlugin` serializes all consumers
+
+`(update_loaded_chunks, render_contours_on_chunk_loaded).chain()` works
+for one consumer but blocks Bevy's parallel scheduler as more land. Also
+relies on `chain`'s implicit command flush for the entity to exist by
+the time `render` runs.
+
+**Fix when needed:** put `update_loaded_chunks` in a `SystemSet` that
+ordering-constrains all `on_chunk_loaded` consumers to run *after* it,
+without forcing them serial with each other. Accept one-frame
+appearance latency.
+
+### 3. `ChunkUnloaded` is currently unusable for cleanup
+
+`chunk_lifecycle` writes `ChunkUnloaded` *and* despawns the entity in
+the same system. A reader processing the event next frame can't safely
+operate on the entity — it's already gone. Fields are marked
+`#[expect(dead_code)]` until a real consumer arrives.
+
+**Fix when needed:** split despawn into a separate system that runs
+after all `ChunkUnloaded` consumers — or redesign so consumers attach
+cleanup logic via `RemovedComponents<ElevationChunk>` (idiomatic Bevy)
+and delete `ChunkUnloaded` entirely.
+
+---
+
+## Open follow-up (not done): rendering / gameplay separation
+
+CLAUDE.md now requires "Separate gameplay and world building from
+rendering always." `contour/render.rs` and the `Mesh2d` / `ColorMaterial`
+handling inside it currently live under `world/`. Worth a conversation
+before extracting — likely target: `src/render/elevation/` or
+`src/world/elevation_render/`. Same question applies to anything else
+mixing visuals into gameplay subtrees.

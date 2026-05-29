@@ -1,0 +1,10 @@
+[package]
+name = "render"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+collision = { workspace = true }
+world = { workspace = true }
+player = { workspace = true }

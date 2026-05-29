@@ -2,6 +2,9 @@
 
 # Work Philosophy
 
+- Write systems in a general modular way as if you intend to use them in future for other things.
+- Keep immutable data and logic separated. Mutable data (like player position) goes with logic
+- Separate gameplay and world building from rendering always.
 - NO QUICK FIXES
 - I REPEAT NO QUICK FIXES
 - NO STRUCTS, TRAITS, IMPLS OR FUNCTIONS IN MOD.RS

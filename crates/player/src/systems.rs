@@ -1,0 +1,50 @@
+use bevy::prelude::*;
+
+use collision::components::{Collider, Solid};
+use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
+use crate::components::Player;
+use world::elevation::height_fn::HeightFn;
+use world::terrain_effects::slope_speed::slope_speed_multiplier;
+
+pub fn setup_player(mut commands: Commands) {
+    commands.spawn((
+        Transform::from_xyz(0.0, 0.0, 1.0),
+        Player,
+        Collider {
+            half_extents: Vec2::splat(PLAYER_SIZE / 2.0),
+        },
+        Solid,
+    ));
+}
+
+pub fn move_player(
+    time: Res<Time>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    height: Res<HeightFn>,
+    mut query: Query<&mut Transform, With<Player>>,
+) {
+    let mut direction = Vec2::ZERO;
+    if keyboard.pressed(KeyCode::ArrowUp) {
+        direction.y += 1.0;
+    }
+    if keyboard.pressed(KeyCode::ArrowDown) {
+        direction.y -= 1.0;
+    }
+    if keyboard.pressed(KeyCode::ArrowLeft) {
+        direction.x -= 1.0;
+    }
+    if keyboard.pressed(KeyCode::ArrowRight) {
+        direction.x += 1.0;
+    }
+
+    if direction != Vec2::ZERO {
+        let dir = direction.normalize();
+        for mut transform in &mut query {
+            let grad = height.gradient(transform.translation.xy());
+            let slope_mul = slope_speed_multiplier(dir, grad);
+            let delta = dir * PLAYER_SPEED * slope_mul * time.delta_secs();
+            transform.translation.x += delta.x;
+            transform.translation.y += delta.y;
+        }
+    }
+}

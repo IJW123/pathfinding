@@ -1,0 +1,16 @@
+[package]
+name = "pathfinding"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "pathfinding"
+path = "src/main.rs"
+
+[dependencies]
+bevy = { workspace = true }
+collision = { workspace = true }
+world = { workspace = true }
+player = { workspace = true }
+hud = { workspace = true }
+render = { workspace = true }

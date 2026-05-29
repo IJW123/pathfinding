@@ -1666,6 +1666,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "collision"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2552,6 +2559,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 
 [[package]]
+name = "hud"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "player",
+ "world",
+]
+
+[[package]]
 name = "id-arena"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3356,6 +3372,11 @@ name = "pathfinding"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "collision",
+ "hud",
+ "player",
+ "render",
+ "world",
 ]
 
 [[package]]
@@ -3425,6 +3446,15 @@ name = "plain"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
+
+[[package]]
+name = "player"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "collision",
+ "world",
+]
 
 [[package]]
 name = "png"
@@ -3698,6 +3728,16 @@ name = "regex-syntax"
 version = "0.8.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
+
+[[package]]
+name = "render"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "collision",
+ "player",
+ "world",
+]
 
 [[package]]
 name = "renderdoc-sys"
@@ -5175,6 +5215,14 @@ dependencies = [
  "serde_json",
  "unicode-xid",
  "wasmparser",
+]
+
+[[package]]
+name = "world"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "collision",
 ]
 
 [[package]]

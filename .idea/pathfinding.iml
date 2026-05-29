@@ -2,6 +2,12 @@
 <module type="EMPTY_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/crates/app/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/collision/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/hud/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/player/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/render/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/world/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
