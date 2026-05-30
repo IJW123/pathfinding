@@ -2563,6 +2563,7 @@ name = "hud"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "motion",
  "player",
  "world",
 ]
@@ -2890,6 +2891,13 @@ checksum = "1fa76a2c86f704bdb222d66965fb3d63269ce38518b83cb0575fca855ebb6316"
 dependencies = [
  "adler2",
  "simd-adler32",
+]
+
+[[package]]
+name = "motion"
+version = "0.1.0"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]
@@ -3374,6 +3382,7 @@ dependencies = [
  "bevy",
  "collision",
  "hud",
+ "motion",
  "player",
  "render",
  "world",
@@ -3453,6 +3462,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "collision",
+ "motion",
  "world",
 ]
 

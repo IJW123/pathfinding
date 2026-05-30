@@ -14,3 +14,4 @@ world = { workspace = true }
 player = { workspace = true }
 hud = { workspace = true }
 render = { workspace = true }
+motion = { workspace = true }

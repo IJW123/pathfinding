@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
-use collision::plugin::CollisionPlugin;
+use collision::plugin::{CollisionPlugin, CollisionSet};
 use hud::plugin::HudPlugin;
+use motion::plugin::{MotionPlugin, MotionSet};
 use player::plugin::PlayerPlugin;
 use render::plugin::RenderPlugin;
 use world::elevation::plugin::ElevationPlugin;
@@ -12,12 +13,14 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins((
             CollisionPlugin,
+            MotionPlugin,
             PlayerPlugin,
             WorldPlugin,
             ElevationPlugin,
             HudPlugin,
             RenderPlugin,
         ))
+        .configure_sets(Update, MotionSet.after(CollisionSet))
         .add_systems(Startup, setup_camera)
         .run();
 }

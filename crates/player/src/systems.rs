@@ -1,19 +1,23 @@
 use bevy::prelude::*;
 
 use collision::components::{Collider, Solid};
+use motion::components::{MeasuredVelocity, PrevPosition};
 use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
 use crate::components::Player;
 use world::elevation::height_fn::HeightFn;
 use world::terrain_effects::slope_speed::slope_speed_multiplier;
 
 pub fn setup_player(mut commands: Commands) {
+    let spawn = Vec2::ZERO;
     commands.spawn((
-        Transform::from_xyz(0.0, 0.0, 1.0),
+        Transform::from_xyz(spawn.x, spawn.y, 1.0),
         Player,
         Collider {
             half_extents: Vec2::splat(PLAYER_SIZE / 2.0),
         },
         Solid,
+        MeasuredVelocity::default(),
+        PrevPosition(spawn),
     ));
 }
 

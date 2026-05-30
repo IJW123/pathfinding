@@ -7,3 +7,4 @@ edition.workspace = true
 bevy = { workspace = true }
 collision = { workspace = true }
 world = { workspace = true }
+motion = { workspace = true }

@@ -7,6 +7,7 @@ members = [
     "crates/player",
     "crates/hud",
     "crates/render",
+    "crates/motion",
 ]
 
 [workspace.package]
@@ -32,6 +33,7 @@ world = { path = "crates/world" }
 player = { path = "crates/player" }
 hud = { path = "crates/hud" }
 render = { path = "crates/render" }
+motion = { path = "crates/motion" }
 
 [profile.dev]
 opt-level = 1
