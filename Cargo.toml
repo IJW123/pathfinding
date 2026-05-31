@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
     "crates/app",
+    "crates/camera_main",
     "crates/collision",
     "crates/world",
     "crates/player",
@@ -28,6 +29,7 @@ bevy = { version = "0.18", default-features = false, features = [
     "sysinfo_plugin",
 ] }
 
+camera_main = { path = "crates/camera_main" }
 collision = { path = "crates/collision" }
 world = { path = "crates/world" }
 player = { path = "crates/player" }

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use camera_main::plugin::CameraMainPlugin;
 use collision::plugin::{CollisionPlugin, CollisionSet};
 use hud::plugin::HudPlugin;
 use motion::plugin::{MotionPlugin, MotionSet};
@@ -12,6 +13,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins((
+            CameraMainPlugin,
             CollisionPlugin,
             MotionPlugin,
             PlayerPlugin,
@@ -21,10 +23,5 @@ fn main() {
             RenderPlugin,
         ))
         .configure_sets(Update, MotionSet.after(CollisionSet))
-        .add_systems(Startup, setup_camera)
         .run();
-}
-
-fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2d);
 }

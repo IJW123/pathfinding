@@ -9,6 +9,7 @@ path = "src/main.rs"
 
 [dependencies]
 bevy = { workspace = true }
+camera_main = { workspace = true }
 collision = { workspace = true }
 world = { workspace = true }
 player = { workspace = true }
