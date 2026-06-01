@@ -1,13 +1,12 @@
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
 
 use collision::components::{Collider, Solid, Static};
 use crate::components::Wall;
-use crate::constants::WALL_THICKNESS;
+use crate::constants::{MAP_HALF_EXTENT, WALL_THICKNESS};
 
-pub fn spawn_bounds(mut commands: Commands, window: Single<&Window, With<PrimaryWindow>>) {
-    let half_w = window.width() / 2.0;
-    let half_h = window.height() / 2.0;
+pub fn spawn_bounds(mut commands: Commands) {
+    let half_w = MAP_HALF_EXTENT;
+    let half_h = MAP_HALF_EXTENT;
     let half_t = WALL_THICKNESS / 2.0;
 
     let walls = [

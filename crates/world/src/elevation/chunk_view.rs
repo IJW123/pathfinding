@@ -2,13 +2,14 @@ use std::collections::HashSet;
 
 use bevy::math::{IVec2, Vec2};
 
+use crate::constants::MAP_HALF_EXTENT;
 use crate::elevation::constants::{CHUNK_VIEW_MARGIN, ELEVATION_CELL, ELEV_CHUNK_CELLS};
 
 #[must_use]
 pub fn desired_chunks(cam_pos: Vec2, viewport_size: Vec2) -> HashSet<IVec2> {
     let half = viewport_size * 0.5 + Vec2::splat(CHUNK_VIEW_MARGIN);
-    let min = cam_pos - half;
-    let max = cam_pos + half;
+    let min = (cam_pos - half).max(Vec2::splat(-MAP_HALF_EXTENT));
+    let max = (cam_pos + half).min(Vec2::splat(MAP_HALF_EXTENT));
     let span = ELEV_CHUNK_CELLS as f32 * ELEVATION_CELL;
     let min_cx = (min.x / span).floor() as i32;
     let max_cx = (max.x / span).floor() as i32;
