@@ -1,0 +1,3 @@
+-Add different terrain features
+-Add structures such as buildings, roads, rails
+-Add moving objects such as NPCs cars, trains

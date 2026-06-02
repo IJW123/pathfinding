@@ -4,7 +4,7 @@ use collision::components::{Collider, Solid};
 use motion::components::{MeasuredVelocity, PrevPosition};
 use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
 use crate::components::Player;
-use world::elevation::height_fn::HeightFn;
+use world::elevation::height_field::HeightField;
 use world::terrain_effects::slope_speed::slope_speed_multiplier;
 
 pub fn setup_player(mut commands: Commands) {
@@ -24,7 +24,7 @@ pub fn setup_player(mut commands: Commands) {
 pub fn move_player(
     time: Res<Time>,
     keyboard: Res<ButtonInput<KeyCode>>,
-    height: Res<HeightFn>,
+    height: Res<HeightField>,
     mut query: Query<&mut Transform, With<Player>>,
 ) {
     let mut direction = Vec2::ZERO;

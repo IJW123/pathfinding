@@ -4,10 +4,10 @@ use crate::elevation::constants::{ELEVATION_CELL, ELEV_CHUNK_CELLS};
 use crate::elevation::chunk_coord::chunk_origin_world;
 use crate::elevation::contour::data::{ContourLine, ContourSegment};
 use crate::elevation::contour::marching::emit_cell_segments;
-use crate::elevation::height_fn::HeightFn;
+use crate::elevation::height_field::HeightField;
 
 #[must_use]
-pub fn extract_contours(coord: IVec2, height: &HeightFn, levels: &[f32]) -> Vec<ContourLine> {
+pub fn extract_contours(coord: IVec2, height: &HeightField, levels: &[f32]) -> Vec<ContourLine> {
     let step = ELEVATION_CELL;
     let origin = chunk_origin_world(coord);
     let dim = ELEV_CHUNK_CELLS + 1;

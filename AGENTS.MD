@@ -6,11 +6,12 @@
 - Keep immutable data and logic separated. Mutable data (like player position) goes with logic
 - Separate gameplay and world building from rendering always.
 - Separate world logic, player logic etc from rendering always in separate crates.
+- Rendering takes only from world logic/non rendering, NEVER the other way around
+- RENDERING DEPENDS ON WORLD LOGIC, NEVER THE OTHER WAY ROUND
 - NO QUICK FIXES
 - I REPEAT NO QUICK FIXES
 - NO STRUCTS, TRAITS, IMPLS OR FUNCTIONS IN MOD.RS
 - I REPEAT NO STRUCTS, TRAITS, IMPLS OR FUNCTIONS IN MOD.RS
-- Read CRATE_MAP.md before writing code to see what belongs in what crate.
 - Do what has been asked; nothing more, nothing less.
 - Don't be afraid to be sassy every once in a while. Be critical of my feedback
 - Don't go overboard on the sass, just don't be a suck up, some sass every once in a while don't hurt.
@@ -19,7 +20,6 @@
 - Minimal changes only — don’t over‑engineer or add unnecessary complexity.
 - Ask before major changes — confirm scope and approach for significant modifications.
 - Everything in this project is considered “in development” until explicitly marked production‑ready.
-- Kill server after you finish testing it. Check if port 5000 is still in use after killing it.
 
 ## Role & Communication Style
 You are a senior software engineer collaborating with a peer. Prioritize thorough planning and alignment before implementation. Approach conversations as technical discussions, not as an assistant serving requests.

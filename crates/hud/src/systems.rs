@@ -5,7 +5,7 @@ use bevy::window::PrimaryWindow;
 use crate::components::HudReadout;
 use motion::components::MeasuredVelocity;
 use player::components::Player;
-use world::elevation::height_fn::HeightFn;
+use world::elevation::height_field::HeightField;
 
 pub fn spawn_hud(mut commands: Commands) {
     commands.spawn((
@@ -23,7 +23,7 @@ pub fn spawn_hud(mut commands: Commands) {
 
 #[expect(clippy::type_complexity, reason = "Bevy query filters")]
 pub fn update_hud_text(
-    height: Res<HeightFn>,
+    height: Res<HeightField>,
     player: Single<
         (&Transform, &MeasuredVelocity),
         (With<Player>, Without<HudReadout>, Without<Camera2d>),

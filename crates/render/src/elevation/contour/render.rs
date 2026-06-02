@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use world::elevation::chunk_events::ChunkLoaded;
 use world::elevation::contour::extract::extract_contours;
-use world::elevation::height_fn::HeightFn;
+use world::elevation::height_field::HeightField;
 
 use crate::elevation::contour::cache::ContourCache;
 use crate::elevation::contour::levels::ContourLevels;
@@ -16,7 +16,7 @@ pub fn render_contours_on_chunk_loaded(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut cache: ResMut<ContourCache>,
-    height: Res<HeightFn>,
+    height: Res<HeightField>,
     levels: Res<ContourLevels>,
     style: Res<ContourStyle>,
 ) {
