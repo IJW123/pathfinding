@@ -28,10 +28,7 @@ pub fn contour_lines_to_mesh(lines: &[ContourLine], style: &ContourStyle) -> Mes
         }
     }
 
-    let mut mesh = Mesh::new(
-        PrimitiveTopology::LineList,
-        RenderAssetUsages::RENDER_WORLD,
-    );
+    let mut mesh = Mesh::new(PrimitiveTopology::LineList, RenderAssetUsages::RENDER_WORLD);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
     mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
     mesh

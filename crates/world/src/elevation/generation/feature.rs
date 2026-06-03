@@ -18,7 +18,15 @@ pub struct FeatureSpec {
 /// Stays low (`[0, FLAT_AMP]`), below the first contour level, so flats render empty.
 #[must_use]
 pub fn flat_base(p: Vec2) -> f32 {
-    FLAT_AMP * fbm(p, FBM_SEED, FBM_OCTAVES, FBM_LACUNARITY, FBM_GAIN, FLAT_FREQ)
+    FLAT_AMP
+        * fbm(
+            p,
+            FBM_SEED,
+            FBM_OCTAVES,
+            FBM_LACUNARITY,
+            FBM_GAIN,
+            FLAT_FREQ,
+        )
 }
 
 /// Additive contribution of one feature at world point `p`: a smooth radial falloff
@@ -31,7 +39,15 @@ pub fn feature_value(p: Vec2, spec: &FeatureSpec) -> f32 {
         return 0.0;
     }
     let falloff = 1.0 - t * t * (3.0 - 2.0 * t);
-    let detail =
-        1.0 + HILL_ROUGHNESS * (fbm(p, FBM_SEED, FBM_OCTAVES, FBM_LACUNARITY, FBM_GAIN, HILL_DETAIL_FREQ) - 0.5);
+    let detail = 1.0
+        + HILL_ROUGHNESS
+            * (fbm(
+                p,
+                FBM_SEED,
+                FBM_OCTAVES,
+                FBM_LACUNARITY,
+                FBM_GAIN,
+                HILL_DETAIL_FREQ,
+            ) - 0.5);
     spec.height * falloff * detail
 }

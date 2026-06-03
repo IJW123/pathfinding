@@ -14,10 +14,7 @@ impl Plugin for WallRenderPlugin {
     }
 }
 
-fn attach_wall_sprite(
-    mut commands: Commands,
-    query: Query<(Entity, &Collider), Added<Wall>>,
-) {
+fn attach_wall_sprite(mut commands: Commands, query: Query<(Entity, &Collider), Added<Wall>>) {
     for (entity, collider) in &query {
         commands.entity(entity).insert(Sprite {
             color: WALL_SPRITE_COLOR,

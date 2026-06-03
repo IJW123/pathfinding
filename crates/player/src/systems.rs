@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
+use crate::components::Player;
+use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
 use collision::components::{Collider, Solid};
 use motion::components::{MeasuredVelocity, PrevPosition};
-use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
-use crate::components::Player;
 use world::elevation::height_field::HeightField;
 use world::terrain_effects::slope_speed::slope_speed_multiplier;
 

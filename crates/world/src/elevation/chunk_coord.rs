@@ -1,7 +1,7 @@
 use bevy::math::{IVec2, Vec2};
 
 use crate::constants::MAP_HALF_EXTENT;
-use crate::elevation::constants::{ELEVATION_CELL, ELEV_CHUNK_CELLS};
+use crate::elevation::constants::{ELEV_CHUNK_CELLS, ELEVATION_CELL};
 
 #[must_use]
 pub fn chunk_origin_world(coord: IVec2) -> Vec2 {

@@ -67,7 +67,7 @@ You are a senior software engineer collaborating with a peer. Prioritize thoroug
 - Be direct with feedback rather than couching it in niceties
 
 ### Always Run Housekeeping
-- **ALWAYS** run `cd /home/isaak/RustroverProjects/pixelconnector && ./bin/housekeeping.sh` after making changes
+- **ALWAYS** run `cd /home/isaak/RustroverProjects/pathfinding && ./bin/housekeeping.sh` after making changes
 - Fix any warnings or errors before considering the task complete
 - Ensure clean compilation with no warnings
 - If housekeeping fails, fix the issues before proceeding

@@ -17,8 +17,12 @@ pub fn resolve_solid_collisions(
             continue;
         }
 
-        let Ok(a_col) = colliders.get(a) else { continue };
-        let Ok(b_col) = colliders.get(b) else { continue };
+        let Ok(a_col) = colliders.get(a) else {
+            continue;
+        };
+        let Ok(b_col) = colliders.get(b) else {
+            continue;
+        };
 
         let (a_center, b_center) = match (transforms.get(a), transforms.get(b)) {
             (Ok(a_tx), Ok(b_tx)) => (a_tx.translation.truncate(), b_tx.translation.truncate()),

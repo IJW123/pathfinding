@@ -1,7 +1,7 @@
 use bevy::math::{IVec2, Vec2};
 
-use crate::elevation::constants::{ELEVATION_CELL, ELEV_CHUNK_CELLS};
 use crate::elevation::chunk_coord::chunk_origin_world;
+use crate::elevation::constants::{ELEV_CHUNK_CELLS, ELEVATION_CELL};
 use crate::elevation::contour::data::{ContourLine, ContourSegment};
 use crate::elevation::contour::marching::emit_cell_segments;
 use crate::elevation::height_field::HeightField;
@@ -36,7 +36,10 @@ pub fn extract_contours(coord: IVec2, height: &HeightField, levels: &[f32]) -> V
                     });
                 }
             }
-            ContourLine { level: iso, segments }
+            ContourLine {
+                level: iso,
+                segments,
+            }
         })
         .collect()
 }

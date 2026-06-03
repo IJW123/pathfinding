@@ -1,3 +1,5 @@
--Add different terrain features
--Add structures such as buildings, roads, rails
--Add moving objects such as NPCs cars, trains
+Add: 
+- Different terrain features
+- SAT Collision detection
+- Structures such as buildings, roads, rails
+- Moving objects such as NPCs cars, trains

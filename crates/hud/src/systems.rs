@@ -62,20 +62,22 @@ pub fn spawn_hud(mut commands: Commands) {
 
 pub fn update_hud_text(
     height: Res<HeightField>,
-    player: Single<(&Transform, &MeasuredVelocity), With<Player>>,
+    player: Option<Single<(&Transform, &MeasuredVelocity), With<Player>>>,
     mut readout: Single<&mut Text, With<HudReadout>>,
 ) {
-    let (player_tx, vel) = *player;
-    let pos = player_tx.translation.truncate();
-    let z = height.sample(pos);
-    let speed = vel.0.length();
-    readout.0 = format!(
-        "x: {}  y: {}\nz: {:.1} m\nspeed: {:.1} m/s",
-        format_distance(pos.x),
-        format_distance(pos.y),
-        z,
-        speed,
-    );
+    if let Some(player) = player {
+        let (player_tx, vel) = *player;
+        let pos = player_tx.translation.truncate();
+        let z = height.sample(pos);
+        let speed = vel.0.length();
+        readout.0 = format!(
+            "x: {}  y: {}\nz: {:.1} m\nspeed: {:.1} m/s",
+            format_distance(pos.x),
+            format_distance(pos.y),
+            z,
+            speed,
+        );
+    }
 }
 
 /// Size the scale bar to the largest "nice" distance fitting within
@@ -89,8 +91,10 @@ pub fn update_scale_bar(
 ) {
     if let Projection::Orthographic(ortho) = projection.into_inner() {
         let metres_per_px = ortho.area.width() / window.width();
-        let nice = nice_distance(TARGET_BAR_PX * metres_per_px);
-        fill.width = Val::Px(nice / metres_per_px);
-        label.0 = format_distance(nice);
+        if metres_per_px.is_finite() && metres_per_px > 0.0 {
+            let nice = nice_distance(TARGET_BAR_PX * metres_per_px);
+            fill.width = Val::Px(nice / metres_per_px);
+            label.0 = format_distance(nice);
+        }
     }
 }

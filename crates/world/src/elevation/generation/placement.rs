@@ -60,8 +60,12 @@ fn random_features(
             let cy = (hash_to_unit(k, 1, seed) * 2.0 - 1.0) * MAP_HALF_EXTENT;
             FeatureSpec {
                 center: Vec2::new(cx, cy),
-                radius: radius_range.0.lerp(radius_range.1, hash_to_unit(k, 2, seed)),
-                height: height_range.0.lerp(height_range.1, hash_to_unit(k, 3, seed)),
+                radius: radius_range
+                    .0
+                    .lerp(radius_range.1, hash_to_unit(k, 2, seed)),
+                height: height_range
+                    .0
+                    .lerp(height_range.1, hash_to_unit(k, 3, seed)),
             }
         })
         .collect()

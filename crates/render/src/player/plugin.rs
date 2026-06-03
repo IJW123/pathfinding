@@ -14,10 +14,7 @@ impl Plugin for PlayerRenderPlugin {
     }
 }
 
-fn attach_player_sprite(
-    mut commands: Commands,
-    query: Query<(Entity, &Collider), Added<Player>>,
-) {
+fn attach_player_sprite(mut commands: Commands, query: Query<(Entity, &Collider), Added<Player>>) {
     for (entity, collider) in &query {
         commands.entity(entity).insert(Sprite {
             color: PLAYER_SPRITE_COLOR,

@@ -20,7 +20,11 @@ pub fn detect_collisions(
     for cell_entities in hash.cells.values() {
         for (i, &a) in cell_entities.iter().enumerate() {
             for &b in &cell_entities[i + 1..] {
-                let pair = if a.index() < b.index() { (a, b) } else { (b, a) };
+                let pair = if a.index() < b.index() {
+                    (a, b)
+                } else {
+                    (b, a)
+                };
                 if !seen.insert(pair) {
                     continue;
                 }

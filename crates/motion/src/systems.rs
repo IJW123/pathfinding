@@ -62,7 +62,10 @@ mod tests {
     }
 
     fn move_to(world: &mut World, entity: Entity, pos: Vec2) {
-        world.get_mut::<Transform>(entity).expect("has Transform").translation = pos.extend(0.0);
+        world
+            .get_mut::<Transform>(entity)
+            .expect("has Transform")
+            .translation = pos.extend(0.0);
     }
 
     #[test]

@@ -2,9 +2,8 @@
 /// and seeded feature placement. No randomness source — same inputs, same output.
 #[must_use]
 pub fn hash_u32(ix: i32, iy: i32, seed: u32) -> u32 {
-    let mut h = seed
-        ^ (ix as u32).wrapping_mul(0x9E37_79B1)
-        ^ (iy as u32).wrapping_mul(0x85EB_CA77);
+    let mut h =
+        seed ^ (ix as u32).wrapping_mul(0x9E37_79B1) ^ (iy as u32).wrapping_mul(0x85EB_CA77);
     h ^= h >> 16;
     h = h.wrapping_mul(0x7FEB_352D);
     h ^= h >> 15;
