@@ -1,41 +1,37 @@
 use bevy::prelude::*;
 
-use world::elevation::chunk_events::ChunkLoaded;
+use world::elevation::chunk_coord::{chunk_origin_world, map_chunk_coords};
 use world::elevation::contour::extract::extract_contours;
 use world::elevation::height_field::HeightField;
 
-use crate::elevation::contour::cache::ContourCache;
+use crate::elevation::components::ContourTile;
 use crate::elevation::contour::levels::ContourLevels;
 use crate::elevation::contour::mesh::contour_lines_to_mesh;
 use crate::elevation::contour::style::ContourStyle;
 
-#[expect(clippy::too_many_arguments, reason = "Bevy system; each param is a distinct resource")]
-pub fn render_contours_on_chunk_loaded(
+/// Build every map tile's contour mesh once at startup. The map is fixed and the
+/// `HeightField` immutable, so geometry never changes; tiles with no contours (flat ground)
+/// are skipped. Bevy frustum-culls offscreen tiles — no streaming needed.
+pub fn spawn_contour_tiles(
     mut commands: Commands,
-    mut events: MessageReader<ChunkLoaded>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut cache: ResMut<ContourCache>,
     height: Res<HeightField>,
     levels: Res<ContourLevels>,
     style: Res<ContourStyle>,
 ) {
-    let material = cache
-        .material
-        .get_or_insert_with(|| materials.add(ColorMaterial::from(Color::WHITE)))
-        .clone();
-
-    for ev in events.read() {
-        let mesh = cache
-            .meshes
-            .entry(ev.coord)
-            .or_insert_with(|| {
-                let lines = extract_contours(ev.coord, &height, &levels.0);
-                meshes.add(contour_lines_to_mesh(&lines, &style))
-            })
-            .clone();
-        commands
-            .entity(ev.entity)
-            .insert((Mesh2d(mesh), MeshMaterial2d(material.clone())));
+    let material = materials.add(ColorMaterial::from(Color::WHITE));
+    for coord in map_chunk_coords() {
+        let lines = extract_contours(coord, &height, &levels.0);
+        if lines.iter().all(|line| line.segments.is_empty()) {
+            continue;
+        }
+        let origin = chunk_origin_world(coord);
+        commands.spawn((
+            Transform::from_xyz(origin.x, origin.y, 0.1),
+            Mesh2d(meshes.add(contour_lines_to_mesh(&lines, &style))),
+            MeshMaterial2d(material.clone()),
+            ContourTile,
+        ));
     }
 }

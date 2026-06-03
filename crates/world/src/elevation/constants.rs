@@ -7,8 +7,6 @@ pub const HEIGHT_MIN: f32 = 0.0;
 /// peaks aren't flat-topped; upper levels no terrain reaches simply emit no contours.
 pub const HEIGHT_MAX: f32 = 250.0;
 
-pub const CHUNK_VIEW_MARGIN: f32 = 200.0;
-
 pub const FBM_SEED: u32 = 0xC0FFEE;
 pub const FBM_OCTAVES: u32 = 4;
 pub const FBM_LACUNARITY: f32 = 2.0;
