@@ -72,6 +72,23 @@ impl HeightField {
         a + (b - a) * fy
     }
 
+    /// Build a height field from explicit parts, bypassing feature generation. Test seam
+    /// for constructing known fields (e.g. a linear ramp) with predictable sampling.
+    #[cfg(test)]
+    pub(crate) fn from_parts(dims: UVec2, origin: Vec2, cell: f32, data: Vec<f32>) -> Self {
+        assert_eq!(
+            data.len(),
+            (dims.x * dims.y) as usize,
+            "data must match dims"
+        );
+        Self {
+            dims,
+            origin,
+            cell,
+            data,
+        }
+    }
+
     /// Central-difference gradient of the height field (world units per world unit).
     #[must_use]
     pub fn gradient(&self, pos: Vec2) -> Vec2 {
@@ -79,5 +96,64 @@ impl HeightField {
         let dx = self.sample(pos + Vec2::new(eps, 0.0)) - self.sample(pos - Vec2::new(eps, 0.0));
         let dy = self.sample(pos + Vec2::new(0.0, eps)) - self.sample(pos - Vec2::new(0.0, eps));
         Vec2::new(dx, dy) / (2.0 * eps)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const EPS: f32 = 1e-3;
+
+    fn approx(a: f32, b: f32) -> bool {
+        (a - b).abs() < EPS
+    }
+
+    /// 5x5 field, cell 10, origin (0,0). Height ramps as `2 * x` (column-driven), so each
+    /// row is [0, 20, 40, 60, 80]. Wide enough that a central-difference gradient (eps = cell)
+    /// stays interior away from the clamp edges.
+    fn ramp_x() -> HeightField {
+        let row = [0.0, 20.0, 40.0, 60.0, 80.0];
+        let data: Vec<f32> = (0..5).flat_map(|_| row).collect();
+        HeightField::from_parts(UVec2::splat(5), Vec2::ZERO, 10.0, data)
+    }
+
+    #[test]
+    fn samples_exactly_at_grid_nodes() {
+        let f = ramp_x();
+        assert!(approx(f.sample(Vec2::new(0.0, 0.0)), 0.0));
+        assert!(approx(f.sample(Vec2::new(10.0, 0.0)), 20.0));
+        assert!(approx(f.sample(Vec2::new(20.0, 20.0)), 40.0));
+    }
+
+    #[test]
+    fn bilinear_midpoint_is_node_average() {
+        let f = ramp_x();
+        // halfway between the x=0 (0) and x=10 (20) columns ⇒ 10.
+        assert!(approx(f.sample(Vec2::new(5.0, 0.0)), 10.0));
+        assert!(approx(f.sample(Vec2::new(15.0, 12.0)), 30.0));
+    }
+
+    #[test]
+    fn out_of_bounds_clamps_to_edge() {
+        let f = ramp_x();
+        assert!(approx(f.sample(Vec2::new(-100.0, 0.0)), 0.0));
+        assert!(approx(f.sample(Vec2::new(999.0, 0.0)), 80.0));
+        assert!(approx(f.sample(Vec2::new(5.0, -50.0)), 10.0));
+    }
+
+    #[test]
+    fn gradient_tracks_ramp_slope() {
+        let f = ramp_x();
+        let g = f.gradient(Vec2::new(20.0, 20.0)); // interior, away from clamp edges
+        assert!(approx(g.x, 2.0), "expected slope 2 in x, got {}", g.x);
+        assert!(approx(g.y, 0.0), "expected flat in y, got {}", g.y);
+    }
+
+    #[test]
+    fn gradient_is_zero_on_flat_field() {
+        let f = HeightField::from_parts(UVec2::splat(3), Vec2::ZERO, 10.0, vec![5.0; 9]);
+        let g = f.gradient(Vec2::new(10.0, 10.0));
+        assert!(approx(g.x, 0.0) && approx(g.y, 0.0));
     }
 }

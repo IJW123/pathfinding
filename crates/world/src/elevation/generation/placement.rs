@@ -70,3 +70,49 @@ fn random_features(
         })
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const RADIUS: (f32, f32) = (120.0, 280.0);
+    const HEIGHT: (f32, f32) = (18.0, 45.0);
+
+    fn same(a: &FeatureSpec, b: &FeatureSpec) -> bool {
+        a.center == b.center && a.radius == b.radius && a.height == b.height
+    }
+
+    #[test]
+    fn random_features_is_deterministic() {
+        let a = random_features(0xABCD, 10, RADIUS, HEIGHT);
+        let b = random_features(0xABCD, 10, RADIUS, HEIGHT);
+        assert_eq!(a.len(), b.len());
+        assert!(a.iter().zip(&b).all(|(x, y)| same(x, y)));
+    }
+
+    #[test]
+    fn random_features_respects_count_and_bounds() {
+        let count = 25;
+        let features = random_features(0x1234, count, RADIUS, HEIGHT);
+        assert_eq!(features.len() as u32, count);
+        for f in &features {
+            assert!(f.center.x.abs() <= MAP_HALF_EXTENT);
+            assert!(f.center.y.abs() <= MAP_HALF_EXTENT);
+            assert!((RADIUS.0..=RADIUS.1).contains(&f.radius));
+            assert!((HEIGHT.0..=HEIGHT.1).contains(&f.height));
+        }
+    }
+
+    #[test]
+    fn different_seed_reshuffles_layout() {
+        let a = random_features(1, 10, RADIUS, HEIGHT);
+        let b = random_features(2, 10, RADIUS, HEIGHT);
+        assert!(a.iter().zip(&b).any(|(x, y)| !same(x, y)));
+    }
+
+    #[test]
+    fn all_features_counts_authored_plus_random() {
+        let expected = AUTHORED_FEATURES.len() + HILL_COUNT as usize + MOUNTAIN_COUNT as usize;
+        assert_eq!(all_features().len(), expected);
+    }
+}
