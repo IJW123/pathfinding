@@ -1,46 +1,36 @@
 use bevy::prelude::*;
 
-use crate::components::{Collider, Solid, Static};
+use crate::components::{Solid, Static};
 use crate::events::CollisionEvent;
 
 pub fn resolve_solid_collisions(
     mut reader: MessageReader<CollisionEvent>,
     solids: Query<(), With<Solid>>,
     statics: Query<(), With<Static>>,
-    colliders: Query<&Collider>,
     mut transforms: Query<&mut Transform>,
 ) {
     for ev in reader.read() {
-        let CollisionEvent { a, b } = *ev;
+        let CollisionEvent {
+            a,
+            b,
+            normal,
+            depth,
+        } = *ev;
 
         if !(solids.contains(a) && solids.contains(b)) {
             continue;
         }
 
-        let Ok(a_col) = colliders.get(a) else {
-            continue;
-        };
-        let Ok(b_col) = colliders.get(b) else {
-            continue;
-        };
-
-        let (a_center, b_center) = match (transforms.get(a), transforms.get(b)) {
-            (Ok(a_tx), Ok(b_tx)) => (a_tx.translation.truncate(), b_tx.translation.truncate()),
-            _ => continue,
-        };
-
-        let Some(push) = aabb_mtv(a_center, b_center, a_col.half_extents + b_col.half_extents)
-        else {
-            continue;
-        };
-
+        // `push = normal * depth` points a→b. Re-signed factors for that convention: the dynamic
+        // body(s) move so the pair separates (a opposite the normal, b along it).
         let (a_factor, b_factor) = match (statics.contains(a), statics.contains(b)) {
             (true, true) => continue,
-            (true, false) => (0.0, -1.0),
-            (false, true) => (1.0, 0.0),
-            (false, false) => (0.5, -0.5),
+            (true, false) => (0.0, 1.0),
+            (false, true) => (-1.0, 0.0),
+            (false, false) => (-0.5, 0.5),
         };
 
+        let push = normal * depth;
         let mut apply = |entity: Entity, factor: f32| {
             if factor == 0.0 {
                 return;
@@ -55,16 +45,48 @@ pub fn resolve_solid_collisions(
     }
 }
 
-/// Axis-Aligned Bounding Box Minimum Translation Vector: shortest push that separates two overlapping AABBs, or `None` if they don't overlap.
-#[must_use]
-fn aabb_mtv(a_center: Vec2, b_center: Vec2, half_sum: Vec2) -> Option<Vec2> {
-    let delta = a_center - b_center;
-    let overlap = half_sum - delta.abs();
-    (overlap.x > 0.0 && overlap.y > 0.0).then(|| {
-        if overlap.x < overlap.y {
-            Vec2::new(overlap.x * delta.x.signum(), 0.0)
-        } else {
-            Vec2::new(0.0, overlap.y * delta.y.signum())
-        }
-    })
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn dynamic_a_pushed_opposite_normal() {
+        let mut app = App::new();
+        app.add_message::<CollisionEvent>()
+            .add_systems(Update, resolve_solid_collisions);
+
+        let a = app.world_mut().spawn((Transform::IDENTITY, Solid)).id();
+        let b = app
+            .world_mut()
+            .spawn((Transform::from_xyz(1.0, 0.0, 0.0), Solid, Static))
+            .id();
+
+        app.world_mut()
+            .resource_mut::<Messages<CollisionEvent>>()
+            .write(CollisionEvent {
+                a,
+                b,
+                normal: Vec2::X,
+                depth: 0.5,
+            });
+        app.update();
+
+        // a dynamic, b static, normal +X depth 0.5 ⇒ a moves −0.5 on X, b unmoved.
+        let a_x = app
+            .world()
+            .entity(a)
+            .get::<Transform>()
+            .unwrap()
+            .translation
+            .x;
+        let b_x = app
+            .world()
+            .entity(b)
+            .get::<Transform>()
+            .unwrap()
+            .translation
+            .x;
+        assert!((a_x - -0.5).abs() < 1e-4, "a_x {a_x}");
+        assert!((b_x - 1.0).abs() < 1e-4, "b_x {b_x}");
+    }
 }

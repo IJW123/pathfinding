@@ -12,9 +12,7 @@ pub fn setup_player(mut commands: Commands) {
     commands.spawn((
         Transform::from_xyz(spawn.x, spawn.y, 1.0),
         Player,
-        Collider {
-            half_extents: Vec2::splat(PLAYER_SIZE / 2.0),
-        },
+        Collider::obb(Vec2::splat(PLAYER_SIZE / 2.0)),
         Solid,
         MeasuredVelocity::default(),
         PrevPosition(spawn),

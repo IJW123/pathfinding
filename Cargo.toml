@@ -5,6 +5,7 @@ members = [
     "crates/camera_main",
     "crates/collision",
     "crates/world",
+    "crates/obstacles",
     "crates/player",
     "crates/hud",
     "crates/render",
@@ -30,10 +31,12 @@ bevy = { version = "0.18", default-features = false, features = [
     "x11",
     "sysinfo_plugin",
 ] }
+smallvec = { version = "1" }
 
 camera_main = { path = "crates/camera_main" }
 collision = { path = "crates/collision" }
 world = { path = "crates/world" }
+obstacles = { path = "crates/obstacles" }
 player = { path = "crates/player" }
 hud = { path = "crates/hud" }
 render = { path = "crates/render" }

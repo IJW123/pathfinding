@@ -18,7 +18,7 @@ fn attach_player_sprite(mut commands: Commands, query: Query<(Entity, &Collider)
     for (entity, collider) in &query {
         commands.entity(entity).insert(Sprite {
             color: PLAYER_SPRITE_COLOR,
-            custom_size: Some(collider.half_extents * 2.0),
+            custom_size: Some(collider.render_size()),
             ..default()
         });
     }

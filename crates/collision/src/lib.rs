@@ -1,7 +1,12 @@
 pub mod components;
 pub mod constants;
 pub mod events;
+pub mod hull;
+pub mod manifold;
 pub mod narrow_phase;
 pub mod plugin;
 pub mod response;
+pub mod sat;
+pub mod shape;
 pub mod spatial_hash;
+pub mod world;

@@ -20,7 +20,7 @@ pub fn spawn_bounds(mut commands: Commands) {
         commands.spawn((
             Transform::from_xyz(pos.x, pos.y, 0.0),
             Wall,
-            Collider { half_extents },
+            Collider::obb(half_extents),
             Solid,
             Static,
         ));

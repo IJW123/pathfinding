@@ -3,6 +3,7 @@ use bevy::prelude::*;
 
 use crate::components::Collider;
 use crate::constants::CELL_SIZE;
+use crate::shape::world_aabb;
 
 #[derive(Resource, Default)]
 pub struct SpatialHash {
@@ -30,8 +31,11 @@ pub fn rebuild_spatial_hash(
 ) {
     hash.cells.clear();
     for (entity, transform, collider) in &query {
-        let center = transform.translation.truncate();
-        for cell in SpatialHash::cells_for_aabb(center, collider.half_extents) {
+        let (min, max) = world_aabb(&collider.shape, transform);
+        // Derived center — for off-center convex hulls this differs from transform.translation.
+        let center = (min + max) * 0.5;
+        let half = (max - min) * 0.5;
+        for cell in SpatialHash::cells_for_aabb(center, half) {
             hash.cells.entry(cell).or_default().push(entity);
         }
     }
