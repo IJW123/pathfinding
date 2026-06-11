@@ -24,6 +24,6 @@ fn main() {
             HudPlugin,
             RenderPlugin,
         ))
-        .configure_sets(Update, MotionSet.after(CollisionSet))
+        .configure_sets(FixedUpdate, MotionSet.after(CollisionSet))
         .run();
 }

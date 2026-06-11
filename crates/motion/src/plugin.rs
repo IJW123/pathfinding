@@ -18,19 +18,20 @@ use crate::systems::measure_velocity;
 ///
 /// Adding [`MotionPlugin`] without ordering `MotionSet` after your
 /// movement and resolution systems yields stale or wrong readings (the
-/// measured delta lags a frame, or misses collision push-out). The current
-/// app wires it correctly:
-/// `move_player -> CollisionSet -> MotionSet -> update_hud_text`.
+/// measured delta lags a tick, or misses collision push-out). The current
+/// app wires it correctly, all in `FixedUpdate`:
+/// `move_player -> CollisionSet -> MotionSet`. Cross-schedule consumers
+/// (e.g. HUD in `Update`) read the last completed tick's value.
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MotionSet;
 
 /// Measures [`MeasuredVelocity`](crate::components::MeasuredVelocity) from
-/// `Transform` deltas each frame. See [`MotionSet`] for the ordering the
-/// app must enforce.
+/// `Transform` deltas each fixed tick. See [`MotionSet`] for the ordering
+/// the app must enforce.
 pub struct MotionPlugin;
 
 impl Plugin for MotionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, measure_velocity.in_set(MotionSet));
+        app.add_systems(FixedUpdate, measure_velocity.in_set(MotionSet));
     }
 }
