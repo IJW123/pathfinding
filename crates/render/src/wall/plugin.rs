@@ -1,7 +1,7 @@
 use bevy::app::{App, Plugin, Update};
 use bevy::prelude::*;
 
-use collision::components::Collider;
+use hitboxes::components::Collider;
 use world::components::Wall;
 
 use crate::wall::constants::WALL_SPRITE_COLOR;

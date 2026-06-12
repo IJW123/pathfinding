@@ -25,9 +25,9 @@ pub fn test_world_pair(a: &WorldShape, b: &WorldShape) -> Option<Manifold> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::shape::ColliderShape;
     use crate::world::to_world;
     use bevy::prelude::*;
+    use hitboxes::shape::ColliderShape;
 
     #[test]
     fn circle_poly_swap_negates_normal() {

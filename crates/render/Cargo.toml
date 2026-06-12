@@ -5,7 +5,7 @@ edition.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-collision = { workspace = true }
+hitboxes = { workspace = true }
 obstacles = { workspace = true }
 world = { workspace = true }
 player = { workspace = true }

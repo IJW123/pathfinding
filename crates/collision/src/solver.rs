@@ -169,10 +169,10 @@ pub fn resolve_collisions(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::components::Collider;
     use crate::shape::world_aabb;
     use crate::static_index::StaticEntry;
     use crate::world::to_world;
+    use hitboxes::components::Collider;
 
     fn dynamic_box(pos: Vec2, half: Vec2, solid: bool) -> DynamicBody {
         let collider = Collider::obb(half);

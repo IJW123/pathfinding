@@ -3,12 +3,12 @@ use bevy::prelude::*;
 use smallvec::SmallVec;
 
 use crate::aabb::Aabb;
-use crate::components::{Collider, Solid, Static};
 use crate::constants::BROAD_PHASE_MARGIN;
 use crate::grid::cells_for_aabb;
 use crate::shape::world_aabb;
 use crate::static_index::StaticColliderIndex;
 use crate::world::{WorldShape, to_world};
+use hitboxes::components::{Collider, Solid, Static};
 
 /// Per-tick snapshot of one dynamic collider. `shape`/`aabb` are world-space caches the solver
 /// translates incrementally; `offset` accumulates corrections for the single Transform

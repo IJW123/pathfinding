@@ -1679,6 +1679,7 @@ name = "collision"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "hitboxes",
  "smallvec",
 ]
 
@@ -2569,6 +2570,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 
 [[package]]
+name = "hitboxes"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "hud"
 version = "0.1.0"
 dependencies = [
@@ -3320,7 +3328,7 @@ name = "obstacles"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "collision",
+ "hitboxes",
 ]
 
 [[package]]
@@ -3482,6 +3490,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "collision",
+ "hitboxes",
  "motion",
  "world",
 ]
@@ -3764,7 +3773,7 @@ name = "render"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "collision",
+ "hitboxes",
  "obstacles",
  "player",
  "world",
@@ -5253,7 +5262,7 @@ name = "world"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "collision",
+ "hitboxes",
 ]
 
 [[package]]

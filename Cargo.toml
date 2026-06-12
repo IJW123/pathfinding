@@ -4,6 +4,7 @@ members = [
     "crates/app",
     "crates/camera_main",
     "crates/collision",
+    "crates/hitboxes",
     "crates/world",
     "crates/obstacles",
     "crates/player",
@@ -35,6 +36,7 @@ smallvec = { version = "1" }
 
 camera_main = { path = "crates/camera_main" }
 collision = { path = "crates/collision" }
+hitboxes = { path = "crates/hitboxes" }
 world = { path = "crates/world" }
 obstacles = { path = "crates/obstacles" }
 player = { path = "crates/player" }

@@ -1,16 +1,8 @@
 use bevy::prelude::*;
+use hitboxes::shape::ColliderShape;
 
 use crate::aabb::Aabb;
-use crate::hull::ConvexHull;
 use crate::world::{rotation_cos_sin, world_poly};
-
-/// Local-space collider geometry. Boxes are zero-or-nonzero-rotation OBBs; there is no
-/// axis-aligned special case.
-pub enum ColliderShape {
-    Obb { half_extents: Vec2 },
-    Convex { hull: ConvexHull }, // local-space; CCW + convexity guaranteed by the type
-    Circle { radius: f32 },
-}
 
 /// World-space bounds for the broad phase. Circle = ±radius; Obb uses the closed-form
 /// rotated-box extent; Convex takes min/max of its rotated, translated vertices (off-center safe).
@@ -46,6 +38,7 @@ pub fn world_aabb(shape: &ColliderShape, transform: &Transform) -> Aabb {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use hitboxes::hull::ConvexHull;
     use std::f32::consts::FRAC_PI_4;
 
     fn close_vec(a: Vec2, b: Vec2) -> bool {

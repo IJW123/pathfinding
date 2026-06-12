@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use collision::components::{Collider, Solid, Static};
+use hitboxes::components::{Collider, Solid, Static};
 
 use crate::components::Obstacle;
 use crate::constants::{

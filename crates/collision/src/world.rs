@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use smallvec::SmallVec;
 
-use crate::shape::ColliderShape;
+use hitboxes::shape::ColliderShape;
 
 /// World-space geometry for the narrow phase. `Poly` stays alloc-free up to 8 verts (boxes are 4,
 /// typical hulls fit); only larger hulls spill to the heap.

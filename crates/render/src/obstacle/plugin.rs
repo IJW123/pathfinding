@@ -1,8 +1,8 @@
 use bevy::app::{App, Plugin, Update};
 use bevy::prelude::*;
 
-use collision::components::{Collider, Static};
-use collision::shape::ColliderShape;
+use hitboxes::components::{Collider, Static};
+use hitboxes::shape::ColliderShape;
 use obstacles::components::Obstacle;
 
 use crate::obstacle::constants::{OBSTACLE_DYNAMIC_COLOR, OBSTACLE_STATIC_COLOR};

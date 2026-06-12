@@ -5,10 +5,6 @@ pub const CELL_SIZE: f32 = 80.0;
 /// ever need to diverge.
 pub const COLLISION_EPSILON: f32 = 1e-4;
 
-/// Hull-validation collinearity threshold on the *sine* of a corner's turn angle
-/// (dimensionless, so scale-free). Corners turning less than this count as straight.
-pub const HULL_COLLINEAR_EPSILON: f32 = 1e-4;
-
 /// Max Gauss-Seidel passes over the solid pair list per tick. The 50/50 dynamic split halves
 /// chain residuals per pass (ratio 0.5), so a 5u-deep chain settles under slop in ~9 passes;
 /// 12 is headroom. Early-exit stops typical ticks after 1–3 passes.

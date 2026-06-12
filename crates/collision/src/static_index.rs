@@ -2,10 +2,10 @@ use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 
 use crate::aabb::Aabb;
-use crate::components::{Collider, Solid, Static};
 use crate::grid::cells_for_aabb;
 use crate::shape::world_aabb;
 use crate::world::{WorldShape, to_world};
+use hitboxes::components::{Collider, Solid, Static};
 
 /// One cached static collider: world-space geometry computed once, valid until the entity's
 /// `Transform`/`Collider` changes (statics don't move, so effectively forever).
