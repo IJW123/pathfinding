@@ -1,8 +1,8 @@
 use bevy::app::{App, Plugin, Update};
 use bevy::prelude::*;
 
-use hitboxes::components::{Collider, Static};
-use hitboxes::shape::ColliderShape;
+use hitboxes_rapier::components::{Collider, Static};
+use hitboxes_rapier::shape::ColliderShape;
 use obstacles::components::Obstacle;
 
 use crate::obstacle::constants::{OBSTACLE_DYNAMIC_COLOR, OBSTACLE_STATIC_COLOR};
@@ -32,10 +32,14 @@ fn attach_obstacle_mesh(
             OBSTACLE_DYNAMIC_COLOR
         };
         let mesh = match &collider.shape {
-            ColliderShape::Circle { radius } => meshes.add(Circle::new(*radius)),
-            ColliderShape::Convex { hull } => meshes.add(convex_mesh(hull.points())),
-            ColliderShape::Obb { half_extents } => {
-                meshes.add(Rectangle::new(half_extents.x * 2.0, half_extents.y * 2.0))
+            ColliderShape::Circle(ball) => meshes.add(Circle::new(ball.radius)),
+            ColliderShape::Convex(_) => {
+                let points = collider.shape.hull_points().expect("convex shape");
+                meshes.add(convex_mesh(&points))
+            }
+            ColliderShape::Obb(_) => {
+                let size = collider.shape.local_extent();
+                meshes.add(Rectangle::new(size.x, size.y))
             }
         };
         commands.entity(entity).insert((

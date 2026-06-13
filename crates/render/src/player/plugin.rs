@@ -1,7 +1,7 @@
 use bevy::app::{App, Plugin, Update};
 use bevy::prelude::*;
 
-use hitboxes::components::Collider;
+use hitboxes_rapier::components::Collider;
 use player::components::Player;
 
 use crate::player::constants::PLAYER_SPRITE_COLOR;

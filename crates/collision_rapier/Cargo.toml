@@ -1,7 +1,9 @@
 [package]
-name = "hitboxes"
+name = "collision_rapier"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
+rapier2d = { workspace = true }
+hitboxes_rapier = { workspace = true }

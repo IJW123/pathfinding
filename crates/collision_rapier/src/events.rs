@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-/// A detected overlap, emitted from the solver's pass-0 (pre-resolution) manifolds. `normal`
+/// A detected overlap, emitted from the solver's pass-0 (pre-resolution) contacts. `normal`
 /// is a unit vector pointing from `a` toward `b`; `depth` is the penetration along it, as it
 /// was *before* any correction this tick.
 ///

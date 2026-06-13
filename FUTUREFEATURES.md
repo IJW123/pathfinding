@@ -7,6 +7,7 @@ Add:
 - Economic structures
 - Currency system
 - Market system
+- Macro for inserting new objects
 
 ## Design note: collision filtering (pass-through / flight)
 

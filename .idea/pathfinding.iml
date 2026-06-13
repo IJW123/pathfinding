@@ -11,7 +11,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/motion/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/camera_main/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/collision_rapier/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/hitboxes/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/hitboxes_rapier/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/obstacles/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

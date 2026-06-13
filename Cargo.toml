@@ -3,8 +3,8 @@ resolver = "3"
 members = [
     "crates/app",
     "crates/camera_main",
-    "crates/collision",
-    "crates/hitboxes",
+    "crates/collision_rapier",
+    "crates/hitboxes_rapier",
     "crates/world",
     "crates/obstacles",
     "crates/player",
@@ -33,10 +33,12 @@ bevy = { version = "0.18", default-features = false, features = [
     "sysinfo_plugin",
 ] }
 smallvec = { version = "1" }
+rapier2d = { version = "0.33" }
+parry2d = { version = "0.28" }
 
 camera_main = { path = "crates/camera_main" }
-collision = { path = "crates/collision" }
-hitboxes = { path = "crates/hitboxes" }
+collision_rapier = { path = "crates/collision_rapier" }
+hitboxes_rapier = { path = "crates/hitboxes_rapier" }
 world = { path = "crates/world" }
 obstacles = { path = "crates/obstacles" }
 player = { path = "crates/player" }

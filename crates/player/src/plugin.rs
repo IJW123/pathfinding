@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::systems::{move_player, setup_player};
-use collision::plugin::CollisionSet;
+use collision_rapier::plugin::CollisionSet;
 
 pub struct PlayerPlugin;
 

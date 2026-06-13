@@ -5,7 +5,7 @@ edition.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-collision = { workspace = true }
-hitboxes = { workspace = true }
+collision_rapier = { workspace = true }
+hitboxes_rapier = { workspace = true }
 world = { workspace = true }
 motion = { workspace = true }

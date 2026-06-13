@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::components::Player;
 use crate::constants::{PLAYER_SIZE, PLAYER_SPEED};
-use hitboxes::components::{Collider, Solid};
+use hitboxes_rapier::components::{Collider, Solid};
 use motion::components::{MeasuredVelocity, PrevPosition};
 use world::elevation::height_field::HeightField;
 use world::terrain_effects::slope_speed::slope_speed_multiplier;

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::components::Wall;
 use crate::constants::{MAP_HALF_EXTENT, WALL_THICKNESS};
-use hitboxes::components::{Collider, Solid, Static};
+use hitboxes_rapier::components::{Collider, Solid, Static};
 
 pub fn spawn_bounds(mut commands: Commands) {
     let half_w = MAP_HALF_EXTENT;
