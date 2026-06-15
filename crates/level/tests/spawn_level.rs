@@ -6,7 +6,7 @@ use bevy::prelude::*;
 
 use hitboxes_rapier::components::Static;
 use level::plugin::LevelPlugin;
-use obstacles::components::{Obstacle, Wall};
+use obstacle::components::{Obstacle, Wall};
 use player::components::Player;
 
 fn run_level() -> App {

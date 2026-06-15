@@ -3,7 +3,7 @@ use bevy::ecs::query::QueryData;
 use bevy::prelude::*;
 
 use hitboxes_rapier::components::{Collider, Static};
-use obstacles::components::{Obstacle, Wall};
+use obstacle::components::{Obstacle, Wall};
 
 use crate::obstacle::constants::{
     OBSTACLE_DYNAMIC_COLOR, OBSTACLE_STATIC_COLOR, OBSTACLE_WALL_COLOR,

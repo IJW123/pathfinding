@@ -2831,7 +2831,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "hitboxes_rapier",
- "obstacles",
+ "obstacle",
  "player",
  "world",
 ]
@@ -3481,7 +3481,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "obstacles"
+name = "obstacle"
 version = "0.1.0"
 dependencies = [
  "bevy",
@@ -3997,7 +3997,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "hitboxes_rapier",
- "obstacles",
+ "obstacle",
  "player",
  "world",
 ]

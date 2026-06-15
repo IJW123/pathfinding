@@ -10,6 +10,14 @@ pub const MAP_HALF_EXTENT: f32 = 2000.0;
 /// Seed for this level's deterministic procedural feature placement.
 pub const FEATURE_SEED: u32 = 0x5EED_1234;
 
+// --- Interior obstacle sizes (circumradius, world units) ---
+// Size is a level-side knob: the obstacle crate owns the silhouette, level decides how big each
+// instance is. Change these to scale an obstacle; change the `Transform` in `spawn` to move it.
+pub const CIRCLE_RADIUS: f32 = 60.0;
+pub const TRIANGLE_SIZE: f32 = 75.0;
+pub const QUAD_SIZE: f32 = 74.0;
+pub const PENTAGON_SIZE: f32 = 65.0;
+
 // --- Procedural feature populations (count + radius/height ranges) ---
 /// Small, common hills.
 pub const HILL_COUNT: u32 = 36;
