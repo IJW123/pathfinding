@@ -1,7 +1,7 @@
 use bevy::math::{UVec2, Vec2};
 use bevy::prelude::Resource;
 
-use crate::constants::MAP_HALF_EXTENT;
+use crate::elevation::config::TerrainConfig;
 use crate::elevation::constants::{ELEVATION_CELL, HEIGHT_MAX, HEIGHT_MIN};
 use crate::elevation::generation::feature::{feature_value, flat_base};
 use crate::elevation::generation::placement::all_features;
@@ -9,7 +9,7 @@ use crate::elevation::generation::placement::all_features;
 /// Stored 2D heightmap covering the finite map. Generated once at startup (flat base +
 /// stamped hill/mountain features) and immutable thereafter, so the per-chunk contour
 /// cache stays valid. Sampled by bilinear interpolation; grid nodes are spaced
-/// [`ELEVATION_CELL`] apart and anchored at `-MAP_HALF_EXTENT`.
+/// [`ELEVATION_CELL`] apart and anchored at `-half_extent`.
 #[derive(Resource)]
 pub struct HeightField {
     dims: UVec2,
@@ -18,13 +18,16 @@ pub struct HeightField {
     data: Vec<f32>,
 }
 
-impl Default for HeightField {
-    fn default() -> Self {
+impl HeightField {
+    /// Build the heightmap from a level's [`TerrainConfig`]: a flat base with every recipe feature
+    /// stamped on top, clamped to `[HEIGHT_MIN, HEIGHT_MAX]`.
+    #[must_use]
+    pub fn new(config: &TerrainConfig) -> Self {
         let cell = ELEVATION_CELL;
-        let n = (2.0 * MAP_HALF_EXTENT / cell).round() as u32 + 1;
+        let n = (2.0 * config.half_extent / cell).round() as u32 + 1;
         let dims = UVec2::splat(n);
-        let origin = Vec2::splat(-MAP_HALF_EXTENT);
-        let features = all_features();
+        let origin = Vec2::splat(-config.half_extent);
+        let features = all_features(config);
 
         let mut data = Vec::with_capacity((n * n) as usize);
         for j in 0..n {

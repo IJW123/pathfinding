@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use world::elevation::chunk_coord::{chunk_origin_world, map_chunk_coords};
+use world::elevation::config::TerrainConfig;
 use world::elevation::contour::extract::extract_contours;
 use world::elevation::height_field::HeightField;
 
@@ -19,9 +20,10 @@ pub fn spawn_contour_tiles(
     height: Res<HeightField>,
     levels: Res<ContourLevels>,
     style: Res<ContourStyle>,
+    config: Res<TerrainConfig>,
 ) {
     let material = materials.add(ColorMaterial::from(Color::WHITE));
-    for coord in map_chunk_coords() {
+    for coord in map_chunk_coords(config.half_extent) {
         let lines = extract_contours(coord, &height, &levels.0);
         if lines.iter().all(|line| line.segments.is_empty()) {
             continue;

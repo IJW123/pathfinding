@@ -6,7 +6,8 @@ use obstacles::constants::{
     CIRCLE_RADIUS, OBSTACLE_Z, PENTAGON_POINTS, QUAD_POINTS, TRIANGLE_POINTS, WALL_THICKNESS,
 };
 use player::bundle::player;
-use world::constants::MAP_HALF_EXTENT;
+
+use crate::constants::MAP_HALF_EXTENT;
 
 /// The single place the starting world is populated. This fn *is* the level layout: instance
 /// positions are inline, while geometry templates (radii, hulls, z-layers) live with their kinds.

@@ -1,5 +1,8 @@
 # Global Context
 
+# Work Flow
+- After going into plan mode you save the plan to plan/p{x}_{name_of_plan}.md 
+
 # Work Philosophy
 
 - Write systems in a general modular way as if you intend to use them in future for other things.
