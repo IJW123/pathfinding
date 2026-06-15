@@ -1,6 +1,24 @@
 use bevy::asset::RenderAssetUsages;
 use bevy::math::Vec2;
+use bevy::math::primitives::{Circle, Rectangle};
 use bevy::mesh::{Indices, Mesh, PrimitiveTopology};
+
+use hitboxes_rapier::shape::ColliderShape;
+
+/// Visual mesh derived from collision geometry — single source of truth, so visuals can't drift
+/// from the collider. Analytic shapes go through bevy's primitive meshers; convex hulls are
+/// fan-triangulated by [`convex_mesh`].
+#[must_use]
+pub fn shape_mesh(shape: &ColliderShape) -> Mesh {
+    match shape {
+        ColliderShape::Circle(ball) => Circle::new(ball.radius).into(),
+        ColliderShape::Convex(_) => convex_mesh(&shape.hull_points().expect("convex shape")),
+        ColliderShape::Obb(_) => {
+            let size = shape.local_extent();
+            Rectangle::new(size.x, size.y).into()
+        }
+    }
+}
 
 /// Filled mesh for a convex hull via fan triangulation (`v0, vi, vi+1`). Points come from
 /// `ConvexHull::points()`, so >= 3 vertices and CCW winding (hence consistent triangle winding)

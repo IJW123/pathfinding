@@ -1,12 +1,14 @@
 use bevy::app::{App, Plugin, Update};
+use bevy::ecs::query::QueryData;
 use bevy::prelude::*;
 
 use hitboxes_rapier::components::{Collider, Static};
-use hitboxes_rapier::shape::ColliderShape;
-use obstacles::components::Obstacle;
+use obstacles::components::{Obstacle, Wall};
 
-use crate::obstacle::constants::{OBSTACLE_DYNAMIC_COLOR, OBSTACLE_STATIC_COLOR};
-use crate::obstacle::mesh::convex_mesh;
+use crate::obstacle::constants::{
+    OBSTACLE_DYNAMIC_COLOR, OBSTACLE_STATIC_COLOR, OBSTACLE_WALL_COLOR,
+};
+use crate::obstacle::mesh::shape_mesh;
 
 pub struct ObstacleRenderPlugin;
 
@@ -16,33 +18,38 @@ impl Plugin for ObstacleRenderPlugin {
     }
 }
 
-/// Build each new obstacle's mesh straight from its collider shape — single source of truth,
-/// so visuals can't drift from collision geometry. Color marks static vs pushable (one-shot
-/// decision at spawn; doesn't track later `Static` changes).
+/// What the renderer reads off each newly-added obstacle. A named query keeps the system signature
+/// readable as the per-kind discriminators grow (`Static`, `Wall`, ...).
+#[derive(QueryData)]
+struct ObstacleRender {
+    entity: Entity,
+    collider: &'static Collider,
+    is_static: Option<&'static Static>,
+    is_wall: Option<&'static Wall>,
+}
+
+/// Per-kind fill color: boundary wall takes precedence over static, which takes precedence over
+/// pushable.
+fn obstacle_color(is_wall: bool, is_static: bool) -> Color {
+    match (is_wall, is_static) {
+        (true, _) => OBSTACLE_WALL_COLOR,
+        (false, true) => OBSTACLE_STATIC_COLOR,
+        (false, false) => OBSTACLE_DYNAMIC_COLOR,
+    }
+}
+
+/// Give each newly-added obstacle a mesh (from its collider geometry) and a kind-colored material.
+/// One-shot at spawn — doesn't track later `Static`/shape changes.
 fn attach_obstacle_mesh(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    query: Query<(Entity, &Collider, Option<&Static>), Added<Obstacle>>,
+    query: Query<ObstacleRender, Added<Obstacle>>,
 ) {
-    for (entity, collider, is_static) in &query {
-        let color = if is_static.is_some() {
-            OBSTACLE_STATIC_COLOR
-        } else {
-            OBSTACLE_DYNAMIC_COLOR
-        };
-        let mesh = match &collider.shape {
-            ColliderShape::Circle(ball) => meshes.add(Circle::new(ball.radius)),
-            ColliderShape::Convex(_) => {
-                let points = collider.shape.hull_points().expect("convex shape");
-                meshes.add(convex_mesh(&points))
-            }
-            ColliderShape::Obb(_) => {
-                let size = collider.shape.local_extent();
-                meshes.add(Rectangle::new(size.x, size.y))
-            }
-        };
-        commands.entity(entity).insert((
+    for item in &query {
+        let color = obstacle_color(item.is_wall.is_some(), item.is_static.is_some());
+        let mesh = meshes.add(shape_mesh(&item.collider.shape));
+        commands.entity(item.entity).insert((
             Mesh2d(mesh),
             MeshMaterial2d(materials.add(ColorMaterial::from(color))),
         ));

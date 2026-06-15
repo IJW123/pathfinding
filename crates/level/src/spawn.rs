@@ -1,13 +1,12 @@
 use bevy::prelude::*;
 
 use hitboxes_rapier::components::Collider;
-use obstacles::bundle::{pushable_obstacle, static_obstacle};
+use obstacles::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
 use obstacles::constants::{
-    CIRCLE_RADIUS, OBSTACLE_Z, PENTAGON_POINTS, QUAD_POINTS, TRIANGLE_POINTS,
+    CIRCLE_RADIUS, OBSTACLE_Z, PENTAGON_POINTS, QUAD_POINTS, TRIANGLE_POINTS, WALL_THICKNESS,
 };
 use player::bundle::player;
-use world::bundle::boundary_walls;
-use world::constants::{MAP_HALF_EXTENT, WALL_THICKNESS};
+use world::constants::MAP_HALF_EXTENT;
 
 /// The single place the starting world is populated. This fn *is* the level layout: instance
 /// positions are inline, while geometry templates (radii, hulls, z-layers) live with their kinds.

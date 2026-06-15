@@ -1,5 +1,6 @@
 Add: 
 - Different terrain features
+- right now hitbox is used by render to render, this needs to be improved
 ~~- SAT Collision detection~~
 - Structures such as buildings, roads, rails
 - Moving objects such as ~~simple polygons~~ NPCs cars, trains

@@ -6,9 +6,8 @@ use bevy::prelude::*;
 
 use hitboxes_rapier::components::Static;
 use level::plugin::LevelPlugin;
-use obstacles::components::Obstacle;
+use obstacles::components::{Obstacle, Wall};
 use player::components::Player;
-use world::components::Wall;
 
 fn run_level() -> App {
     let mut app = App::new();
@@ -24,8 +23,8 @@ fn spawns_expected_counts() {
     assert_eq!(world.query::<&Wall>().iter(world).count(), 4, "4 walls");
     assert_eq!(
         world.query::<&Obstacle>().iter(world).count(),
-        4,
-        "4 obstacles"
+        8,
+        "4 interior obstacles + 4 walls (walls are obstacles)"
     );
     assert_eq!(world.query::<&Player>().iter(world).count(), 1, "1 player");
 }

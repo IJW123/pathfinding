@@ -9,3 +9,9 @@ use hitboxes_rapier::components::Solid;
 #[derive(Component)]
 #[require(Solid)]
 pub struct Obstacle;
+
+/// Boundary-wall sub-kind: an [`Obstacle`] tag the renderer keys off for the wall color. Walls are
+/// built via [`crate::bundle::wall`], which supplies `Obstacle`/`Solid`/`Static` — so this is a
+/// plain tag with no required components of its own.
+#[derive(Component)]
+pub struct Wall;
