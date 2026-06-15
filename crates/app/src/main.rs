@@ -3,12 +3,11 @@ use bevy::prelude::*;
 use camera_main::plugin::CameraMainPlugin;
 use collision_rapier::plugin::{CollisionPlugin, CollisionSet};
 use hud::plugin::HudPlugin;
+use level::plugin::LevelPlugin;
 use motion::plugin::{MotionPlugin, MotionSet};
-use obstacles::plugin::ObstaclesPlugin;
 use player::plugin::PlayerPlugin;
 use render::plugin::RenderPlugin;
 use world::elevation::plugin::ElevationPlugin;
-use world::plugin::WorldPlugin;
 
 fn main() {
     App::new()
@@ -18,9 +17,8 @@ fn main() {
             CollisionPlugin,
             MotionPlugin,
             PlayerPlugin,
-            WorldPlugin,
-            ObstaclesPlugin,
             ElevationPlugin,
+            LevelPlugin,
             HudPlugin,
             RenderPlugin,
         ))

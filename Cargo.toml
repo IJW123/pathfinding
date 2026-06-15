@@ -5,6 +5,7 @@ members = [
     "crates/camera_main",
     "crates/collision_rapier",
     "crates/hitboxes_rapier",
+    "crates/level",
     "crates/world",
     "crates/obstacles",
     "crates/player",
@@ -39,6 +40,7 @@ parry2d = { version = "0.28" }
 camera_main = { path = "crates/camera_main" }
 collision_rapier = { path = "crates/collision_rapier" }
 hitboxes_rapier = { path = "crates/hitboxes_rapier" }
+level = { path = "crates/level" }
 world = { path = "crates/world" }
 obstacles = { path = "crates/obstacles" }
 player = { path = "crates/player" }

@@ -39,8 +39,8 @@ impl Collider {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Solid;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Static;

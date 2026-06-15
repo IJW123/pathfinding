@@ -14,6 +14,8 @@
       <sourceFolder url="file://$MODULE_DIR$/crates/collision_rapier/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/hitboxes/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/hitboxes_rapier/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/level/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/level/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/crates/obstacles/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

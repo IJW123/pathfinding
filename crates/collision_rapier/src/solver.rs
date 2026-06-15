@@ -126,15 +126,17 @@ fn pair_contact(
     }
 }
 
-/// Correction for one contact: resolve penetration beyond the slop, damped by
-/// `PENETRATION_PERCENT`. Returns false when the contact is already within slop.
+/// Correction for one contact: resolve penetration beyond `slop`, damped by
+/// `PENETRATION_PERCENT`. Returns false when the contact is already within slop. `slop` is passed
+/// in (not read from the constant) so the dead-band is testable independent of the production value.
 fn apply_correction(
     bodies: &mut [SolverBody],
     pair: &CandidatePair,
     normal: Vec2,
     depth: f32,
+    slop: f32,
 ) -> bool {
-    let push_len = (depth - PENETRATION_SLOP).max(0.0) * PENETRATION_PERCENT;
+    let push_len = (depth - slop).max(0.0) * PENETRATION_PERCENT;
     if push_len <= 0.0 {
         return false;
     }
@@ -165,6 +167,7 @@ pub fn solve_pairs(
     anchors: &[StaticAnchor],
     pairs: &[CandidatePair],
     contacts: &mut Vec<InitialContact>,
+    slop: f32,
 ) -> SolveOutcome {
     let mut applied = false;
     for pair in pairs {
@@ -184,7 +187,7 @@ pub fn solve_pairs(
             depth,
         });
         if pair.both_solid {
-            applied |= apply_correction(bodies, pair, normal, depth);
+            applied |= apply_correction(bodies, pair, normal, depth, slop);
         }
     }
 
@@ -193,7 +196,7 @@ pub fn solve_pairs(
         applied = false;
         for pair in pairs.iter().filter(|p| p.both_solid) {
             if let Some((normal, depth)) = pair_contact(bodies, anchors, pair) {
-                applied |= apply_correction(bodies, pair, normal, depth);
+                applied |= apply_correction(bodies, pair, normal, depth, slop);
             }
         }
         iterations_run += 1;
@@ -340,7 +343,7 @@ pub fn resolve_collisions(
         contacts,
         ..
     } = &mut *buffers;
-    solve_pairs(bodies, anchors, pairs, contacts);
+    solve_pairs(bodies, anchors, pairs, contacts, PENETRATION_SLOP);
 
     for contact in buffers.contacts.drain(..) {
         writer.write(CollisionEvent {
@@ -447,7 +450,13 @@ mod tests {
         let anchors = vec![obb_anchor(Vec2::new(15.0, 0.0), Vec2::splat(10.0))];
         let pairs = vec![solid_pair(PairBodies::DynamicStatic { body: 0, anchor: 0 })];
         let mut contacts = Vec::new();
-        solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts);
+        solve_pairs(
+            &mut bodies,
+            &anchors,
+            &pairs,
+            &mut contacts,
+            PENETRATION_SLOP,
+        );
 
         assert!(bodies[0].offset.x < 0.0, "offset {:?}", bodies[0].offset);
         assert!(bodies[0].offset.y.abs() < 1e-4);
@@ -473,7 +482,13 @@ mod tests {
             solid_pair(PairBodies::DynamicStatic { body: 0, anchor: 1 }),
         ];
         let mut contacts = Vec::new();
-        solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts);
+        solve_pairs(
+            &mut bodies,
+            &anchors,
+            &pairs,
+            &mut contacts,
+            PENETRATION_SLOP,
+        );
 
         assert!(residual_depth(&bodies, &anchors, &pairs[0]) <= SETTLE);
         assert!(residual_depth(&bodies, &anchors, &pairs[1]) <= SETTLE);
@@ -496,7 +511,13 @@ mod tests {
             solid_pair(PairBodies::DynamicStatic { body: 1, anchor: 0 }),
         ];
         let mut contacts = Vec::new();
-        let outcome = solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts);
+        let outcome = solve_pairs(
+            &mut bodies,
+            &anchors,
+            &pairs,
+            &mut contacts,
+            PENETRATION_SLOP,
+        );
 
         assert!(residual_depth(&bodies, &anchors, &pairs[0]) <= SETTLE);
         assert!(residual_depth(&bodies, &anchors, &pairs[1]) <= SETTLE);
@@ -514,7 +535,13 @@ mod tests {
         let anchors = vec![obb_anchor(Vec2::new(100.0, 0.0), Vec2::splat(10.0))];
         let pairs = vec![solid_pair(PairBodies::DynamicStatic { body: 0, anchor: 0 })];
         let mut contacts = Vec::new();
-        let outcome = solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts);
+        let outcome = solve_pairs(
+            &mut bodies,
+            &anchors,
+            &pairs,
+            &mut contacts,
+            PENETRATION_SLOP,
+        );
 
         assert_eq!(outcome.iterations_run, 1);
         assert!(contacts.is_empty());
@@ -522,17 +549,40 @@ mod tests {
     }
 
     #[test]
-    fn overlap_within_slop_not_corrected() {
-        // Penetration 0.3 < slop 0.5: contact reported, nothing moved (rest-jitter kill).
+    fn slop_band_gates_corrections() {
+        // Tests the slop dead-band directly with an explicit slop, independent of the production
+        // PENETRATION_SLOP value: penetration below slop is left in place (rest-jitter kill);
+        // penetration beyond slop is projected down to the slop band.
+        const TEST_SLOP: f32 = 0.5;
+
+        // Shallow: penetration 0.3 < slop → contact reported, nothing moved, no extra passes.
         let mut bodies = vec![obb_body(Vec2::ZERO, Vec2::splat(10.0))];
         let anchors = vec![obb_anchor(Vec2::new(19.7, 0.0), Vec2::splat(10.0))];
         let pairs = vec![solid_pair(PairBodies::DynamicStatic { body: 0, anchor: 0 })];
         let mut contacts = Vec::new();
-        let outcome = solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts);
+        let outcome = solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts, TEST_SLOP);
 
         assert_eq!(contacts.len(), 1, "still a contact event");
-        assert_eq!(bodies[0].offset, Vec2::ZERO);
-        assert_eq!(outcome.iterations_run, 1);
+        assert_eq!(
+            bodies[0].offset,
+            Vec2::ZERO,
+            "shallow overlap left in place"
+        );
+        assert_eq!(outcome.iterations_run, 1, "no correction passes");
+
+        // Deep: penetration 1.0 > slop → corrected, settling to ~slop (not fully out).
+        let mut bodies = vec![obb_body(Vec2::ZERO, Vec2::splat(10.0))];
+        let anchors = vec![obb_anchor(Vec2::new(19.0, 0.0), Vec2::splat(10.0))];
+        let pairs = vec![solid_pair(PairBodies::DynamicStatic { body: 0, anchor: 0 })];
+        let mut contacts = Vec::new();
+        solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts, TEST_SLOP);
+
+        assert!(bodies[0].offset.x < 0.0, "deep overlap corrected");
+        let residual = residual_depth(&bodies, &anchors, &pairs[0]);
+        assert!(
+            (residual - TEST_SLOP).abs() < 1e-3,
+            "settles to the slop band, not fully out: got {residual}"
+        );
     }
 
     #[test]
@@ -544,7 +594,13 @@ mod tests {
         let anchors = Vec::new();
         let pairs = vec![solid_pair(PairBodies::DynamicDynamic { a: 0, b: 1 })];
         let mut contacts = Vec::new();
-        solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts);
+        solve_pairs(
+            &mut bodies,
+            &anchors,
+            &pairs,
+            &mut contacts,
+            PENETRATION_SLOP,
+        );
 
         assert!(
             (bodies[0].offset.x + bodies[1].offset.x).abs() < 1e-4,
@@ -566,7 +622,13 @@ mod tests {
             both_solid: false,
         }];
         let mut contacts = Vec::new();
-        solve_pairs(&mut bodies, &anchors, &pairs, &mut contacts);
+        solve_pairs(
+            &mut bodies,
+            &anchors,
+            &pairs,
+            &mut contacts,
+            PENETRATION_SLOP,
+        );
 
         assert_eq!(contacts.len(), 1);
         assert!(contacts[0].normal.x > 0.9, "a→b convention");

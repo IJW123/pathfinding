@@ -12,7 +12,7 @@ bevy = { workspace = true }
 camera_main = { workspace = true }
 collision_rapier = { workspace = true }
 world = { workspace = true }
-obstacles = { workspace = true }
+level = { workspace = true }
 player = { workspace = true }
 hud = { workspace = true }
 render = { workspace = true }
