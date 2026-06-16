@@ -86,6 +86,39 @@ impl Inventory {
     }
 }
 
+/// How much an entity may hold, per axis. `None` means unbounded on that axis: a storage building
+/// caps volume only, a carrier caps both. Density decides which cap binds first — a dense good
+/// fills the weight cap before the volume cap, a bulky one the reverse. Holders without a `Capacity`
+/// are unbounded (preserves the original deposit-anything behaviour).
+#[derive(Component, Debug, Clone, Copy, Default)]
+pub struct Capacity {
+    pub max_weight: Option<f32>,
+    pub max_volume: Option<f32>,
+}
+
+impl Capacity {
+    /// Units of `commodity` depositable into `inv` without breaching either cap. Floors on the
+    /// binding axis; returns `requested` when both axes are unbounded.
+    #[must_use]
+    pub fn grantable(&self, inv: &Inventory, commodity: Commodity, requested: u32) -> u32 {
+        let headroom = |cap: Option<f32>, used: f32, per_unit: f32| match cap {
+            Some(max) if per_unit > 0.0 => ((max - used) / per_unit).floor().max(0.0) as u32,
+            _ => requested,
+        };
+        requested
+            .min(headroom(
+                self.max_weight,
+                inv.total_weight(),
+                commodity.unit_weight(),
+            ))
+            .min(headroom(
+                self.max_volume,
+                inv.total_volume(),
+                commodity.unit_volume(),
+            ))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -129,5 +162,53 @@ mod tests {
             4.0 * Commodity::Grain.unit_volume() + 2.0 * Commodity::IronOre.unit_volume();
         assert!((inv.total_weight() - expected_weight).abs() < f32::EPSILON);
         assert!((inv.total_volume() - expected_volume).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn grantable_unbounded_passes_request_through() {
+        let cap = Capacity::default();
+        assert_eq!(
+            cap.grantable(&Inventory::default(), Commodity::Grain, 1000),
+            1000
+        );
+    }
+
+    #[test]
+    fn grantable_floors_on_weight() {
+        // 100 kg cap, grain weighs 25/unit → 4 units fit, ask for 10.
+        let cap = Capacity {
+            max_weight: Some(100.0),
+            max_volume: None,
+        };
+        assert_eq!(
+            cap.grantable(&Inventory::default(), Commodity::Grain, 10),
+            4
+        );
+    }
+
+    #[test]
+    fn grantable_floors_on_volume() {
+        // 0.1 m³ cap, grain is 25/770 ≈ 0.0325 m³/unit → 3 units fit.
+        let cap = Capacity {
+            max_weight: None,
+            max_volume: Some(0.1),
+        };
+        assert_eq!(
+            cap.grantable(&Inventory::default(), Commodity::Grain, 10),
+            3
+        );
+    }
+
+    #[test]
+    fn grantable_zero_when_already_full() {
+        let cap = Capacity {
+            max_weight: Some(50.0),
+            max_volume: None,
+        };
+        let inv = Inventory {
+            grain: 2, // 50 kg, exactly at the cap
+            ..Inventory::default()
+        };
+        assert_eq!(cap.grantable(&inv, Commodity::Grain, 5), 0);
     }
 }

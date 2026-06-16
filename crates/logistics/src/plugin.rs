@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::cargo_handling::message::CargoHaul;
+use crate::cargo_handling::systems::{apply_cargo_hauls, dock_haul_input};
 use crate::message::CommodityTransfer;
 use crate::systems::apply_commodity_transfers;
 
@@ -12,7 +14,18 @@ pub struct LogisticsPlugin;
 impl Plugin for LogisticsPlugin {
     fn build(&self, app: &mut App) {
         app.add_message::<CommodityTransfer>()
-            .add_systems(Update, apply_commodity_transfers);
+            .add_message::<CargoHaul>()
+            .add_systems(Update, apply_commodity_transfers)
+            // `dock_haul_input` reads `ButtonInput`, so it only runs once an `InputPlugin` has
+            // supplied it (headless-safe); chained before the system that drains its messages.
+            .add_systems(
+                Update,
+                (
+                    dock_haul_input.run_if(resource_exists::<ButtonInput<KeyCode>>),
+                    apply_cargo_hauls,
+                )
+                    .chain(),
+            );
 
         // Dev-only keyboard driver. `debug_storage_input` reads `ButtonInput`, so it only runs when
         // an `InputPlugin` has supplied that resource — keeps the plugin usable in headless tests.

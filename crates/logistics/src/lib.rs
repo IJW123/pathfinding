@@ -1,4 +1,5 @@
 pub mod bundle;
+pub mod cargo_handling;
 pub mod commodity;
 pub mod components;
 pub mod constants;

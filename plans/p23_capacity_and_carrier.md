@@ -1,101 +1,105 @@
-# p23 — Inventory capacity (weight + volume) and the player as carrier
+# p23 — Capacity (weight + volume), player as carrier, and cargo handling
 
-Introduce capacity limits on things that hold goods, and make the player a carrier.
-Consumes the previously-dead `total_weight`/`total_volume`/`props` machinery from p22.
+Capacity limits on holders, the player as a capacity-limited carrier, and real
+holder-to-holder hauling (load/unload) gated by a circular dock zone. Consumes the
+previously-dead `total_weight`/`total_volume`/`props` machinery from p22.
 
 ## Model (confirmed)
 
-A holder is constrained on up to two axes:
-- **weight** (mass, kg) — `total_weight()`
-- **volume** (space, m³) — `total_volume()`, where each unit's volume = weight / density
+Two constraint axes: **weight** (kg, `total_weight()`) and **volume** (m³,
+`total_volume()`, where unit volume = weight / density).
 
-| Holder            | weight cap | volume cap | why                                   |
-|-------------------|-----------|------------|----------------------------------------|
-| Storage building  | —         | yes        | space-limited; weight irrelevant on the ground |
-| Carrier (player)  | yes       | yes        | a vehicle is mass- *and* space-limited; density decides which binds first |
-
-Density "matters" precisely because it converts a count into volume: a dense good (iron
-ore) hits the **weight** cap first; a bulky low-density good (lumber) hits the **volume**
-cap first.
+| Holder           | weight cap | volume cap | notes |
+|------------------|-----------|------------|-------|
+| Storage building | —         | yes        | space-limited only |
+| Carrier (player) | yes       | yes        | density decides which binds first |
 
 ## Decisions taken
-- Overflow on deposit: **partial fill to cap** — deposit as many units as fit on *both*
-  axes, leave the rest unmoved (not silently discarded).
-- Movement: **none new**. The player already moves by keyboard; it just gains carrier
-  components. A standalone mobile vessel + pathfinding is a later plan.
+- Overflow on deposit: **partial fill** — move as many units as fit on *both* axes; the
+  rest stays at the source (now real, because hauling has a source).
+- Movement: **none new** — player already moves by keyboard; it just gains carrier comps.
+- Hauling trigger: **circular dock zone** around the building; keys **9 = load-all**
+  (building→player), **0 = unload-all** (player→building), only when the carrier is inside
+  the zone. Existing **1–8** keep stocking the building (debug). Per action: **all goods,
+  as much as fits**.
+- Location: hauling lives in a new `logistics/src/cargo_handling/` module.
 
-## 1. `Capacity` component (`logistics`)
-
-New component in `components.rs` (alongside `Inventory`/`Storage`):
+## 1. `Capacity` component (`logistics/src/components.rs`)
 ```rust
 #[derive(Component, Debug, Clone, Copy, Default)]
-pub struct Capacity {
-    pub max_weight: Option<f32>, // None = unbounded on this axis
-    pub max_volume: Option<f32>,
-}
+pub struct Capacity { pub max_weight: Option<f32>, pub max_volume: Option<f32> } // None = unbounded
 ```
-`Option` per axis keeps it one general component: building sets `max_volume` only, carrier
-sets both. `None` = no limit (preserves today's uncapped behaviour for holders without a
-`Capacity`).
-
-Pure grant helper (testable, no ECS):
+Pure, tested helper:
 ```rust
 impl Capacity {
-    /// Units of `commodity` that may be deposited into `inv` without breaching either cap.
-    /// Floors on the binding axis; returns `requested` if uncapped.
+    /// Units of `commodity` depositable into `inv` without breaching either cap (floors the
+    /// binding axis; `requested` if uncapped).
     #[must_use]
-    pub fn grantable(&self, inv: &Inventory, commodity: Commodity, requested: u32) -> u32 { ... }
+    pub fn grantable(&self, inv: &Inventory, commodity: Commodity, requested: u32) -> u32
 }
 ```
-Math: per-unit `w = commodity.unit_weight()`, `v = commodity.unit_volume()`; headroom count
-on each capped axis = `floor((max - current)/per_unit)` clamped ≥ 0; `grantable = min(requested,
-weight_count, volume_count)`. `unit_weight`/`unit_volume` are > 0, so no div-by-zero.
+Math: per-unit `w`/`v` from the commodity; capped-axis headroom = `floor((max-current)/per_unit)`
+clamped ≥0; `min(requested, weight_count, volume_count)`.
 
-## 2. Capacity-aware transfers (`systems.rs`)
+## 2. Capacity-aware single-target transfers (`systems.rs`)
+`apply_commodity_transfers` queries `(&mut Inventory, Option<&Capacity>)`. Deposit grants
+`capacity.map_or(amount, |c| c.grantable(..))`; withdraw unchanged; no `Capacity` ⇒ full
+deposit (today's behaviour preserved).
 
-`apply_commodity_transfers` queries `(&mut Inventory, Option<&Capacity>)`:
-- **Deposit**: `granted = capacity.map_or(amount, |c| c.grantable(&inv, commodity, amount))`,
-  then `inv.add(commodity, granted)`. No `Capacity` ⇒ full deposit (unchanged behaviour).
-- **Withdraw**: unchanged (already clamps at 0; caps are upper bounds only).
-- Partial-fill visibility: in debug, `log` when `granted < amount` (shortfall). No new
-  outcome message yet — a real remainder only exists once load/unload has a *source*
-  inventory (next plan); deposits today are conjured by the debug driver.
+## 3. `cargo_handling/` module (`logistics`)
+mod.rs declarations only (per repo rule). Submodules:
+- `components.rs`:
+  - `Carrier` — marker for a mobile cargo holder (the player now; a future vessel later). Lets
+    cargo systems find the hauler **without** a `logistics → player` dep.
+  - `DockZone { radius: f32 }` — circular load/unload range around a holder (the building).
+- `message.rs`: `CargoHaul { source: Entity, dest: Entity }` — move *all* commodities
+  source→dest, as much as fits.
+- `systems.rs`:
+  - `apply_cargo_hauls`: `Query<&mut Inventory>` (+ `Query<&Capacity>`). For each haul,
+    `get_many_mut([source, dest])` (skip if equal/missing); per `Commodity::ALL`, move
+    `min(available_at_source, grantable_at_dest)` — grantable recomputed against the *running*
+    dest state so the shared weight/volume budget is respected across commodities. Remainder
+    stays in source (real partial-fill).
+  - `dock_haul_input`: `9`/`0` just-pressed → for each `Carrier`, find the nearest `Storage`
+    whose `DockZone` contains it (xy distance ≤ radius); write `CargoHaul` in the right
+    direction. Guarded with `run_if(resource_exists::<ButtonInput<KeyCode>>)` (headless-safe,
+    same as the debug driver).
 
-## 3. Attach capacity where the knobs live (`level`)
+## 4. Plugin wiring (`logistics/src/plugin.rs`)
+Register `CargoHaul`; add `dock_haul_input` (guarded) + `apply_cargo_hauls` to `Update`. Add
+`pub mod cargo_handling;` to lib.rs.
 
-`Capacity` magnitudes are per-instance level knobs (like size/position), so they're inserted
-at spawn in `level::spawn` — NOT baked into `storage_building`'s signature. This keeps the
-bundle (and its tests) untouched and mirrors how the player gets its components.
+## 5. Compose in `level::spawn` (knobs live here)
+- Storage entity: `.insert((Capacity { max_weight: None, max_volume: Some(STORAGE_MAX_VOLUME) },
+  DockZone { radius: STORAGE_DOCK_RADIUS }))`.
+- Player entity: `.insert((Inventory::default(), Carrier, Capacity { max_weight:
+  Some(CARRIER_MAX_WEIGHT), max_volume: Some(CARRIER_MAX_VOLUME) }))`.
+- New `level/src/constants.rs`: `STORAGE_MAX_VOLUME`, `STORAGE_DOCK_RADIUS`, `CARRIER_MAX_WEIGHT`,
+  `CARRIER_MAX_VOLUME`. Carrier caps small enough that loading the full building clamps (shows
+  partial-fill).
 
-- Storage entity: `.insert(Capacity { max_weight: None, max_volume: Some(STORAGE_MAX_VOLUME) })`.
-- Player entity: spawn already returns `EntityCommands`; chain
-  `.insert((Inventory::default(), Capacity { max_weight: Some(CARRIER_MAX_WEIGHT),
-  max_volume: Some(CARRIER_MAX_VOLUME) }))`.
-- New constants in `level/src/constants.rs`: `STORAGE_MAX_VOLUME`, `CARRIER_MAX_WEIGHT`,
-  `CARRIER_MAX_VOLUME`.
+`level` already depends on `logistics` + `player`; no new edges. `player` stays movement-only.
 
-`level` already depends on both `logistics` and `player`; no new crate edges. `player` stays
-movement-only (no logistics dep); `logistics` stays cargo-only.
+## 6. Debug driver (`logistics/src/debug.rs`)
+Unchanged role: 1–8 stock the building (`With<Storage>` deposits, now capacity-clamped by the
+building's volume cap). Keep as-is.
 
-## 4. Debug driver retarget (`logistics/src/debug.rs`)
-
-Currently deposits into `With<Storage>`. Retarget to `With<Inventory>` so the player
-(carrier) also receives — lets you watch the weight cap clamp on the player and the volume
-cap clamp on the building from the same keypresses. Dev-only, already gated.
+## 7. Visualize the zone (`render/src/logistics`)
+`draw_dock_zones`: a `Gizmos` circle (radius = `DockZone.radius`) around each zone so the
+player can see where to dock. New `DOCK_ZONE_COLOR`. Render reads logistics — correct direction.
 
 ## Tests
-- `Capacity::grantable`: uncapped passthrough; weight-bound; volume-bound; already-over-cap
-  ⇒ 0; exact-fit boundary.
-- transfer partial-fill: deposit exceeding a cap lands exactly the fitted amount, not more.
-- Existing `message_mutates_target_inventory` (no `Capacity` on the test entity) still passes
-  unchanged — proves the uncapped path is preserved.
+- `Capacity::grantable`: uncapped passthrough; weight-bound; volume-bound; over-cap ⇒ 0;
+  exact-fit boundary.
+- `apply_cargo_hauls`: full move when dest roomy; partial move when dest cap binds with the
+  remainder left in source; shared budget across multiple commodities; source==dest no-op.
+- Existing `message_mutates_target_inventory` (no `Capacity`) still passes unchanged.
 
 ## Verification
 - `./bin/housekeeping.sh` clean.
-- `cargo run -p pathfinding`: drive the player, press 1–8; player stock stops climbing at its
-  weight/volume cap, building stock stops at its volume cap. `--release` still drops the debug
-  driver.
+- `cargo run -p pathfinding`: 1–8 fill the building (stops at its volume cap); drive the player
+  into the zone circle, `9` loads until a carrier cap binds (leftover stays in building), `0`
+  unloads back. `--release` still drops the debug driver.
 
 ## Out of scope (next plans)
-- Load/unload *between* a carrier and a building (transfers with a source + the real remainder).
-- A standalone mobile `Vessel` entity and pathfinding around obstacles.
+- A standalone mobile `Vessel` entity; pathfinding around obstacles; non-debug order UI.

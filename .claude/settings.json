@@ -6,5 +6,18 @@
       "Bash(cargo build *)",
       "Bash(cargo test *)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/isaak/RustroverProjects/pathfinding/bin/plan_review.sh"
+          }
+        ]
+      }
+    ]
   }
 }
