@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use logistics::bundle::storage_building;
 use logistics::cargo_handling::components::{Carrier, DockZone};
+use logistics::commodity::Commodity;
 use logistics::components::{Capacity, Inventory};
 use logistics::constants::STORAGE_Z;
 use obstacle::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
@@ -49,12 +50,12 @@ pub fn spawn_level(mut commands: Commands) {
         .spawn(storage_building(
             Transform::from_xyz(-250.0, 200.0, STORAGE_Z),
             Vec2::splat(STORAGE_HALF_EXTENT),
-            Inventory {
-                grain: 100,
-                coal: 40,
-                lumber: 60,
-                iron_ore: 20,
-            },
+            Inventory::from_stock([
+                (Commodity::Grain, 100),
+                (Commodity::Coal, 40),
+                (Commodity::Lumber, 60),
+                (Commodity::IronOre, 20),
+            ]),
         ))
         .insert((
             Capacity {

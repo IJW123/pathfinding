@@ -73,9 +73,9 @@ pub fn debug_storage_input(
 /// Debug-only: log a storage's stock whenever it changes, so keyboard-driven transfers are visible.
 pub fn log_inventory_changes(changed: Query<(Entity, &Inventory), Changed<Inventory>>) {
     for (entity, inv) in &changed {
-        info!(
-            "storage {entity}: grain={} coal={} lumber={} iron_ore={}",
-            inv.grain, inv.coal, inv.lumber, inv.iron_ore
-        );
+        let stock = Commodity::ALL
+            .map(|c| format!("{c:?}={}", inv.amount(c)))
+            .join(" ");
+        info!("storage {entity}: {stock}");
     }
 }

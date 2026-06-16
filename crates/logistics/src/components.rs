@@ -14,33 +14,32 @@ pub struct Storage;
 /// The goods an entity currently holds. General-purpose: a warehouse, a transport truck, a ship —
 /// anything that carries commodities gets one (it is *not* tied to [`Storage`]). Unbounded above;
 /// every count clamps at 0 below. All mutation routes through [`Inventory::apply`] so the message
-/// system and any future caller share one path.
+/// system and any future caller share one path. Counts live in an array indexed by
+/// `Commodity as usize`, so adding a good costs nothing here — only the enum side grows.
 #[derive(Component, Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Inventory {
-    pub grain: u32,
-    pub coal: u32,
-    pub lumber: u32,
-    pub iron_ore: u32,
+    counts: [u32; Commodity::COUNT],
 }
 
 impl Inventory {
+    /// Build an inventory from `(commodity, count)` pairs; unmentioned goods start at 0. Repeated
+    /// commodities accumulate (saturating), since each pair routes through [`Inventory::add`].
+    #[must_use]
+    pub fn from_stock(stock: impl IntoIterator<Item = (Commodity, u32)>) -> Self {
+        let mut inventory = Self::default();
+        for (commodity, amount) in stock {
+            inventory.add(commodity, amount);
+        }
+        inventory
+    }
+
     #[must_use]
     pub fn amount(&self, commodity: Commodity) -> u32 {
-        match commodity {
-            Commodity::Grain => self.grain,
-            Commodity::Coal => self.coal,
-            Commodity::Lumber => self.lumber,
-            Commodity::IronOre => self.iron_ore,
-        }
+        self.counts[commodity as usize]
     }
 
     fn slot_mut(&mut self, commodity: Commodity) -> &mut u32 {
-        match commodity {
-            Commodity::Grain => &mut self.grain,
-            Commodity::Coal => &mut self.coal,
-            Commodity::Lumber => &mut self.lumber,
-            Commodity::IronOre => &mut self.iron_ore,
-        }
+        &mut self.counts[commodity as usize]
     }
 
     /// Add `amount` of `commodity` (saturating).
@@ -133,10 +132,7 @@ mod tests {
 
     #[test]
     fn remove_clamps_at_zero_and_reports_actual() {
-        let mut inv = Inventory {
-            coal: 3,
-            ..Inventory::default()
-        };
+        let mut inv = Inventory::from_stock([(Commodity::Coal, 3)]);
         assert_eq!(inv.remove(Commodity::Coal, 10), 3, "only 3 available");
         assert_eq!(inv.amount(Commodity::Coal), 0);
     }
@@ -151,11 +147,7 @@ mod tests {
 
     #[test]
     fn totals_sum_weight_and_volume_over_stock() {
-        let inv = Inventory {
-            grain: 4,
-            iron_ore: 2,
-            ..Inventory::default()
-        };
+        let inv = Inventory::from_stock([(Commodity::Grain, 4), (Commodity::IronOre, 2)]);
         let expected_weight =
             4.0 * Commodity::Grain.unit_weight() + 2.0 * Commodity::IronOre.unit_weight();
         let expected_volume =
@@ -205,10 +197,7 @@ mod tests {
             max_weight: Some(50.0),
             max_volume: None,
         };
-        let inv = Inventory {
-            grain: 2, // 50 kg, exactly at the cap
-            ..Inventory::default()
-        };
+        let inv = Inventory::from_stock([(Commodity::Grain, 2)]); // 50 kg, exactly at the cap
         assert_eq!(cap.grantable(&inv, Commodity::Grain, 5), 0);
     }
 }

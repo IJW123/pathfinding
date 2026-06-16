@@ -98,17 +98,26 @@ mod tests {
         let mut world = World::new();
         let src = holder(
             &mut world,
-            Inventory {
-                grain: 10,
-                ..Inventory::default()
-            },
+            Inventory::from_stock([(Commodity::Grain, 10)]),
             None,
         );
         let dst = holder(&mut world, Inventory::default(), None);
         haul(&mut world, src, dst);
 
-        assert_eq!(world.get::<Inventory>(src).unwrap().grain, 0);
-        assert_eq!(world.get::<Inventory>(dst).unwrap().grain, 10);
+        assert_eq!(
+            world
+                .get::<Inventory>(src)
+                .unwrap()
+                .amount(Commodity::Grain),
+            0
+        );
+        assert_eq!(
+            world
+                .get::<Inventory>(dst)
+                .unwrap()
+                .amount(Commodity::Grain),
+            10
+        );
     }
 
     #[test]
@@ -116,10 +125,7 @@ mod tests {
         let mut world = World::new();
         let src = holder(
             &mut world,
-            Inventory {
-                grain: 10, // 250 kg
-                ..Inventory::default()
-            },
+            Inventory::from_stock([(Commodity::Grain, 10)]), // 250 kg
             None,
         );
         // dest holds only 100 kg → 4 grain fit, 6 stay behind.
@@ -133,9 +139,19 @@ mod tests {
         );
         haul(&mut world, src, dst);
 
-        assert_eq!(world.get::<Inventory>(dst).unwrap().grain, 4, "only 4 fit");
         assert_eq!(
-            world.get::<Inventory>(src).unwrap().grain,
+            world
+                .get::<Inventory>(dst)
+                .unwrap()
+                .amount(Commodity::Grain),
+            4,
+            "only 4 fit"
+        );
+        assert_eq!(
+            world
+                .get::<Inventory>(src)
+                .unwrap()
+                .amount(Commodity::Grain),
             6,
             "remainder stays in source"
         );
@@ -147,11 +163,7 @@ mod tests {
         // 10 grain (250 kg) + 10 coal (300 kg) at source.
         let src = holder(
             &mut world,
-            Inventory {
-                grain: 10,
-                coal: 10,
-                ..Inventory::default()
-            },
+            Inventory::from_stock([(Commodity::Grain, 10), (Commodity::Coal, 10)]),
             None,
         );
         // 300 kg cap: grain goes first (ALL order) → 10 grain = 250 kg, then 1 coal = 30 kg (280),
@@ -167,8 +179,8 @@ mod tests {
         haul(&mut world, src, dst);
 
         let got = world.get::<Inventory>(dst).unwrap();
-        assert_eq!(got.grain, 10);
-        assert_eq!(got.coal, 1);
+        assert_eq!(got.amount(Commodity::Grain), 10);
+        assert_eq!(got.amount(Commodity::Coal), 1);
     }
 
     #[test]
@@ -176,13 +188,13 @@ mod tests {
         let mut world = World::new();
         let e = holder(
             &mut world,
-            Inventory {
-                grain: 5,
-                ..Inventory::default()
-            },
+            Inventory::from_stock([(Commodity::Grain, 5)]),
             None,
         );
         haul(&mut world, e, e);
-        assert_eq!(world.get::<Inventory>(e).unwrap().grain, 5);
+        assert_eq!(
+            world.get::<Inventory>(e).unwrap().amount(Commodity::Grain),
+            5
+        );
     }
 }

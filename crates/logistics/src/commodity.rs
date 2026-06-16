@@ -35,13 +35,18 @@ pub enum CommodityChange {
 }
 
 impl Commodity {
-    /// Every commodity, for folding over an [`crate::components::Inventory`].
+    /// Every commodity, for folding over an [`crate::components::Inventory`]. The order is load-
+    /// bearing: it must match each variant's `as usize` discriminant, since [`Inventory`] stores
+    /// counts in an array indexed that way (asserted by `all_matches_discriminant_order`).
     pub const ALL: [Commodity; 4] = [
         Commodity::Grain,
         Commodity::Coal,
         Commodity::Lumber,
         Commodity::IronOre,
     ];
+
+    /// Number of commodities — the width of [`crate::components::Inventory`]'s count array.
+    pub const COUNT: usize = Self::ALL.len();
 
     /// Physical properties of this commodity — the single per-commodity record. `constants.rs`
     /// holds the numbers; this match is the only place they're keyed to a variant.
@@ -89,6 +94,15 @@ impl Commodity {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn all_matches_discriminant_order() {
+        // Inventory indexes its count array by `Commodity as usize`, so each variant's position in
+        // ALL must equal its discriminant. Reordering the enum without reordering ALL breaks this.
+        for (i, commodity) in Commodity::ALL.into_iter().enumerate() {
+            assert_eq!(commodity as usize, i);
+        }
+    }
 
     #[test]
     fn unit_volume_is_weight_over_density() {

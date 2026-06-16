@@ -26,15 +26,13 @@ pub fn storage_building(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commodity::Commodity;
     use hitboxes_rapier::components::Solid;
 
     #[test]
     fn storage_building_is_solid_static_with_inventory() {
         let mut world = World::new();
-        let inv = Inventory {
-            grain: 42,
-            ..Inventory::default()
-        };
+        let inv = Inventory::from_stock([(Commodity::Grain, 42)]);
         let e = world
             .spawn(storage_building(
                 Transform::IDENTITY,

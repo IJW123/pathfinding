@@ -69,7 +69,9 @@ mod tests {
         app.update();
 
         assert_eq!(
-            app.world().get::<Inventory>(store).map(|i| i.iron_ore),
+            app.world()
+                .get::<Inventory>(store)
+                .map(|i| i.amount(Commodity::IronOre)),
             Some(7)
         );
     }
