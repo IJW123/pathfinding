@@ -18,6 +18,10 @@ pub const TRIANGLE_SIZE: f32 = 75.0;
 pub const QUAD_SIZE: f32 = 74.0;
 pub const PENTAGON_SIZE: f32 = 65.0;
 
+/// Storage building half-extent (square, world units). Like the obstacle sizes above, size is the
+/// level-side knob — the `infrastructure` crate owns the square silhouette, level picks how big.
+pub const STORAGE_HALF_EXTENT: f32 = 50.0;
+
 // --- Procedural feature populations (count + radius/height ranges) ---
 /// Small, common hills.
 pub const HILL_COUNT: u32 = 36;

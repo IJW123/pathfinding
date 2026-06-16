@@ -1,11 +1,16 @@
 use bevy::prelude::*;
 
+use logistics::bundle::storage_building;
+use logistics::components::Inventory;
+use logistics::constants::STORAGE_Z;
 use obstacle::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
 use obstacle::constants::{OBSTACLE_Z, WALL_THICKNESS};
 use obstacle::shape::{circle, pentagon, quad, triangle};
 use player::bundle::player;
 
-use crate::constants::{CIRCLE_RADIUS, MAP_HALF_EXTENT, PENTAGON_SIZE, QUAD_SIZE, TRIANGLE_SIZE};
+use crate::constants::{
+    CIRCLE_RADIUS, MAP_HALF_EXTENT, PENTAGON_SIZE, QUAD_SIZE, STORAGE_HALF_EXTENT, TRIANGLE_SIZE,
+};
 
 /// The single place the starting world is populated. This fn *is* the level layout: per-instance
 /// position (`Transform`) and size live here, while the silhouette of each shape lives with its
@@ -34,6 +39,18 @@ pub fn spawn_level(mut commands: Commands) {
     commands.spawn(pushable_obstacle(
         Transform::from_xyz(320.0, -200.0, OBSTACLE_Z),
         pentagon(PENTAGON_SIZE),
+    ));
+
+    // Storage building (infrastructure): a square holding a starting stock of goods.
+    commands.spawn(storage_building(
+        Transform::from_xyz(-250.0, 200.0, STORAGE_Z),
+        Vec2::splat(STORAGE_HALF_EXTENT),
+        Inventory {
+            grain: 100,
+            coal: 40,
+            lumber: 60,
+            iron_ore: 20,
+        },
     ));
 
     // Player.

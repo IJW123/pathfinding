@@ -4,6 +4,7 @@ use camera_main::plugin::CameraMainPlugin;
 use collision_rapier::plugin::{CollisionPlugin, CollisionSet};
 use hud::plugin::HudPlugin;
 use level::plugin::LevelPlugin;
+use logistics::plugin::LogisticsPlugin;
 use motion::plugin::{MotionPlugin, MotionSet};
 use player::plugin::PlayerPlugin;
 use render::plugin::RenderPlugin;
@@ -18,6 +19,7 @@ fn main() {
             MotionPlugin,
             PlayerPlugin,
             ElevationPlugin,
+            LogisticsPlugin,
             LevelPlugin,
             HudPlugin,
             RenderPlugin,

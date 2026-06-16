@@ -7,6 +7,7 @@ members = [
     "crates/hitboxes_rapier",
     "crates/level",
     "crates/world",
+    "crates/logistics",
     "crates/obstacle",
     "crates/player",
     "crates/hud",
@@ -42,6 +43,7 @@ collision_rapier = { path = "crates/collision_rapier" }
 hitboxes_rapier = { path = "crates/hitboxes_rapier" }
 level = { path = "crates/level" }
 world = { path = "crates/world" }
+logistics = { path = "crates/logistics" }
 obstacle = { path = "crates/obstacle" }
 player = { path = "crates/player" }
 hud = { path = "crates/hud" }

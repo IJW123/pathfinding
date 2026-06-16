@@ -17,6 +17,8 @@
       <sourceFolder url="file://$MODULE_DIR$/crates/level/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/level/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/crates/obstacles/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/infrastructure/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/logistics/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/obstacle/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

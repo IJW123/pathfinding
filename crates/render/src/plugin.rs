@@ -1,6 +1,7 @@
 use bevy::app::{App, Plugin};
 
 use crate::elevation::plugin::ContourRenderPlugin;
+use crate::logistics::plugin::StorageRenderPlugin;
 use crate::obstacle::plugin::ObstacleRenderPlugin;
 use crate::player::plugin::PlayerRenderPlugin;
 
@@ -11,6 +12,7 @@ impl Plugin for RenderPlugin {
         app.add_plugins((
             ContourRenderPlugin,
             ObstacleRenderPlugin,
+            StorageRenderPlugin,
             PlayerRenderPlugin,
         ));
     }
