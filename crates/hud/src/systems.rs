@@ -8,7 +8,7 @@ use crate::constants::{
 };
 use crate::format::{format_distance, nice_distance};
 use motion::components::MeasuredVelocity;
-use player::components::Player;
+use selection::components::Selected;
 use world::elevation::height_field::HeightField;
 
 pub fn spawn_hud(mut commands: Commands) {
@@ -62,12 +62,12 @@ pub fn spawn_hud(mut commands: Commands) {
 
 pub fn update_hud_text(
     height: Res<HeightField>,
-    player: Option<Single<(&Transform, &MeasuredVelocity), With<Player>>>,
+    selected: Option<Single<(&Transform, &MeasuredVelocity), With<Selected>>>,
     mut readout: Single<&mut Text, With<HudReadout>>,
 ) {
-    if let Some(player) = player {
-        let (player_tx, vel) = *player;
-        let pos = player_tx.translation.truncate();
+    if let Some(selected) = selected {
+        let (transform, vel) = *selected;
+        let pos = transform.translation.truncate();
         let z = height.sample(pos);
         let speed = vel.0.length();
         readout.0 = format!(

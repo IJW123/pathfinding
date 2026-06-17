@@ -6,8 +6,8 @@ use hud::plugin::HudPlugin;
 use level::plugin::LevelPlugin;
 use logistics::plugin::LogisticsPlugin;
 use motion::plugin::{MotionPlugin, MotionSet};
-use player::plugin::PlayerPlugin;
 use render::plugin::RenderPlugin;
+use selection::plugin::SelectionPlugin;
 use world::elevation::plugin::ElevationPlugin;
 
 fn main() {
@@ -17,7 +17,7 @@ fn main() {
             CameraMainPlugin,
             CollisionPlugin,
             MotionPlugin,
-            PlayerPlugin,
+            SelectionPlugin,
             ElevationPlugin,
             LogisticsPlugin,
             LevelPlugin,

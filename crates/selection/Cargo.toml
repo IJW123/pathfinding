@@ -1,10 +1,11 @@
 [package]
-name = "hud"
+name = "selection"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-selection = { workspace = true }
+hitboxes_rapier = { workspace = true }
+parry2d = { workspace = true }
 world = { workspace = true }
-motion = { workspace = true }
+collision_rapier = { workspace = true }

@@ -14,7 +14,7 @@ collision_rapier = { workspace = true }
 world = { workspace = true }
 logistics = { workspace = true }
 level = { workspace = true }
-player = { workspace = true }
+selection = { workspace = true }
 hud = { workspace = true }
 render = { workspace = true }
 motion = { workspace = true }

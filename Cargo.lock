@@ -2637,7 +2637,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "motion",
- "player",
+ "selection",
  "world",
 ]
 
@@ -2832,8 +2832,10 @@ dependencies = [
  "bevy",
  "hitboxes_rapier",
  "logistics",
+ "motion",
  "obstacle",
  "player",
+ "selection",
  "world",
 ]
 
@@ -3604,8 +3606,8 @@ dependencies = [
  "level",
  "logistics",
  "motion",
- "player",
  "render",
+ "selection",
  "world",
 ]
 
@@ -3682,10 +3684,8 @@ name = "player"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "collision_rapier",
  "hitboxes_rapier",
  "motion",
- "world",
 ]
 
 [[package]]
@@ -4010,6 +4010,7 @@ dependencies = [
  "logistics",
  "obstacle",
  "player",
+ "selection",
  "world",
 ]
 
@@ -4115,6 +4116,17 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
+
+[[package]]
+name = "selection"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "collision_rapier",
+ "hitboxes_rapier",
+ "parry2d",
+ "world",
+]
 
 [[package]]
 name = "self_cell"

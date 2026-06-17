@@ -5,10 +5,12 @@ use logistics::cargo_handling::components::{Carrier, DockZone};
 use logistics::commodity::Commodity;
 use logistics::components::{Capacity, Inventory};
 use logistics::constants::STORAGE_Z;
+use motion::components::{MeasuredVelocity, PrevPosition};
 use obstacle::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
 use obstacle::constants::{OBSTACLE_Z, WALL_THICKNESS};
 use obstacle::shape::{circle, pentagon, quad, triangle};
 use player::bundle::player;
+use selection::components::{Selectable, Selected};
 
 use crate::constants::{
     CARRIER_MAX_VOLUME, CARRIER_MAX_WEIGHT, CIRCLE_RADIUS, MAP_HALF_EXTENT, PENTAGON_SIZE,
@@ -46,9 +48,10 @@ pub fn spawn_level(mut commands: Commands) {
 
     // Storage building (infrastructure): a square holding a starting stock of goods. Capped by
     // space only, with a circular dock zone a carrier must enter to load/unload.
+    let storage_pos = Vec2::new(-250.0, 200.0);
     commands
         .spawn(storage_building(
-            Transform::from_xyz(-250.0, 200.0, STORAGE_Z),
+            Transform::from_xyz(storage_pos.x, storage_pos.y, STORAGE_Z),
             Vec2::splat(STORAGE_HALF_EXTENT),
             Inventory::from_stock([
                 (Commodity::Grain, 100),
@@ -65,6 +68,11 @@ pub fn spawn_level(mut commands: Commands) {
             DockZone {
                 radius: STORAGE_DOCK_RADIUS,
             },
+            Selectable,
+            // Velocity readout for when this is the selected (controlled) entity. PrevPosition is
+            // seeded to spawn so the first measured tick isn't a spike.
+            MeasuredVelocity::default(),
+            PrevPosition(storage_pos),
         ));
 
     // Player doubles as the cargo carrier for now: an empty inventory capped on both weight and
@@ -76,5 +84,8 @@ pub fn spawn_level(mut commands: Commands) {
             max_weight: Some(CARRIER_MAX_WEIGHT),
             max_volume: Some(CARRIER_MAX_VOLUME),
         },
+        // Player is just another selectable, controlled by default until the user picks something else.
+        Selectable,
+        Selected,
     ));
 }
