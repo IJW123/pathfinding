@@ -13,3 +13,5 @@ player = { workspace = true }
 selection = { workspace = true }
 motion = { workspace = true }
 sprites = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }

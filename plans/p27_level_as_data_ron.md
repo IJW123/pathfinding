@@ -98,9 +98,10 @@ unparseable `level.ron` means **no world** — unplayable. So `load_level_spec` 
 message naming the path (matches `spritebake`'s "fail loudly" ethos). No sensible default level.
 
 ### Plugin
-`LevelPlugin`: add `.add_systems(PreStartup, load_level_spec)` (before `Startup` spawn, same ordering
-`sprites` uses so the resource exists when `spawn_level` reads it). Add `serde` + `ron` to
-`level/Cargo.toml`.
+`LevelPlugin`: add `.add_systems(PreStartup, load_level_spec.run_if(not(resource_exists::<LevelSpec>)))`
+(before the `Startup` spawn, same ordering `sprites` uses so the resource exists when `spawn_level`
+reads it; the `run_if` guard is the test/override seam — see decision 2a). Add `serde` + `ron` to
+`level/Cargo.toml` (both already in the workspace via `sprites`).
 
 ## Decisions to confirm
 1. **Commodity in RON** — `logistics::Commodity` has no serde. Two options:
@@ -120,26 +121,52 @@ message naming the path (matches `spritebake`'s "fail loudly" ethos). No sensibl
    `From<RawStorageSpec>` impl in `spec.rs` (`raw.stock.into_iter().map(|(c, n)| (c.to_commodity(), n))`).
    A `#[cfg(test)]` exhaustiveness check keeps the four-variant match honest against `Commodity::ALL`.
 2. **Existing integration test** `crates/level/tests/spawn_level.rs` (`spawns_expected_counts`,
-   `two_obstacles_are_pushable`) calls `spawn_level`, whose signature gains `Res<LevelSpec>`. The test
-   must insert a `LevelSpec` to keep running. This is a forced *adaptation*, not removed coverage —
-   but per the no-silent-test-edits rule I need your OK. Proposed: build a small in-memory `LevelSpec`
-   in the test (decouples it from file IO; assertions unchanged). Add a `#[cfg(test)] LevelSpec::sample()`
-   helper if cleaner.
+   `two_obstacles_are_pushable`) builds an `App`, `add_plugins(LevelPlugin)`, `update()`, and asserts
+   counts (8 obstacles incl. 4 walls, 2 pushable, 1 player). Two problems once this lands, **both
+   needing your OK** under the no-silent-test-edits rule:
+
+   **2a — the test will panic before asserting anything.** `LevelPlugin` now registers
+   `load_level_spec` (PreStartup) which `fs::read_to_string(LEVEL_PATH)` + `.expect()`s. `cargo test -p
+   level` runs with cwd = `crates/level/`, so the workspace-root-relative `assets/level.ron` does not
+   resolve → `expect` panics in PreStartup. (sprites never hit this because it `warn!`s; our fail-loud
+   choice is what surfaces it.) A real bug, not just a test annoyance: it's the "no LevelSpec was
+   provided and the file is unreachable" path.
+
+   **Fix (a clean seam, not a hack):** guard the loader —
+   `load_level_spec.run_if(not(resource_exists::<LevelSpec>))`. Semantics: *load from disk only when a
+   spec wasn't already provided.* Production with a missing file → resource absent → loader runs →
+   `expect` panics loudly (intent preserved). Any caller (the test) that pre-inserts a `LevelSpec` →
+   loader skips → zero file IO. This run-condition is the documented override hook, and it's how the
+   test stays on the real `LevelPlugin` boundary instead of bypassing it.
+
+   **2b — the inserted spec must reproduce the asserted topology.** The test inserts an in-memory
+   `LevelSpec` (before `update()`) with 4 obstacles (2 `pushable: true`), the storage, and the carrier,
+   so `spawns_expected_counts`/`two_obstacles_are_pushable` hold unchanged. This is a forced
+   *adaptation* (signature/wiring change), not removed coverage — assertions are identical. Provide a
+   `#[cfg(test)] fn sample() -> LevelSpec` (in `spec.rs`, or a small builder in the test) to avoid file
+   IO and keep the literal topology in one place.
 
 ## Steps
 1. `serde`/`ron` → `level/Cargo.toml`.
-2. `objects/spec.rs` (in-memory types + Resource), `objects/manifest.rs` (raw + From), `objects/loader.rs`.
-3. Repurpose `objects/constants.rs` → `LEVEL_PATH`; delete the four capacity consts + the four obstacle
-   sizes + `STORAGE_HALF_EXTENT` from `level/constants.rs`.
-4. Widen `storage`/`carrier_player` to take spec refs; update their unit tests.
-5. `spawn_level` reads `Res<LevelSpec>`; `LevelPlugin` loads at PreStartup.
+2. `objects/manifest.rs` (pure raw serde structs + `RawCommodity` + `to_commodity`), `objects/spec.rs`
+   (in-memory types + `Resource` + the `From<Raw…>` impls), `objects/loader.rs`.
+3. Repurpose `objects/constants.rs` → `LEVEL_PATH`; delete the four capacity consts (from
+   `objects/constants.rs`) + the four obstacle sizes + `STORAGE_HALF_EXTENT` (from `level/constants.rs`).
+4. Widen `storage`/`carrier_player` to take spec refs; update their unit tests (keep the hardcoded
+   `"warehouse"` SpriteId in `storage`).
+5. `spawn_level` reads `Res<LevelSpec>`; `LevelPlugin` adds
+   `load_level_spec.run_if(not(resource_exists::<LevelSpec>))` at PreStartup.
 6. Write `assets/level.ron`.
-7. Adapt `tests/spawn_level.rs` (pending decision #2).
+7. Adapt `tests/spawn_level.rs`: insert a sample `LevelSpec` before `update()` (decisions 2a/2b).
 8. `./bin/housekeeping.sh`; run the app to confirm identical world.
 
 ## Tests
-- `manifest.rs`: parse a small RON string → assert it maps to the right spec (round-trips shape enum,
-  tuple→Vec2, RawCommodity→Commodity).
+- `spec.rs`: parse a small RON string via `ron::from_str::<RawLevelSpec>` then `LevelSpec::from(raw)` →
+  assert the in-memory result (shape enum survives, tuple→`Vec2`, `RawCommodity::to_commodity` →
+  `Commodity`). This is the round-trip test; it lives where the `From` impls do.
+- `RawCommodity::to_commodity`: `#[cfg(test)]` exhaustiveness vs `Commodity::ALL` so adding a good can't
+  silently leave the match stale.
 - `spec`/constructor tests from p26 stay, retargeted to spec-ref signatures.
 - Loader: not unit-tested (file IO at fixed path); covered by the app-run smoke check.
-```
+
+<!-- auto-reviewed -->

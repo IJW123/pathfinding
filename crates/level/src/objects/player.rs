@@ -8,23 +8,23 @@ use logistics::components::{Capacity, Inventory};
 use player::bundle::player;
 use selection::components::{Selectable, Selected};
 
-use crate::objects::constants::{CARRIER_MAX_VOLUME, CARRIER_MAX_WEIGHT};
+use crate::objects::spec::CarrierSpec;
 
-/// The player avatar at `spawn`, doubling as the cargo carrier: an empty inventory capped on both
+/// The player avatar from `spec`, doubling as the cargo carrier: an empty inventory capped on both
 /// weight and volume (so hauling a full building clamps), and selectable + `Selected` so it's the
 /// default-controlled entity until the user picks something else.
 ///
-/// `player(spawn)` already ships `PrevPosition(spawn)` and `Player` requires `MeasuredVelocity`, so
-/// neither is re-added here.
+/// `player(spawn)` already ships `PrevPosition(spawn)` and applies the player Z, and `Player`
+/// requires `MeasuredVelocity`, so neither is re-added here.
 #[must_use]
-pub fn carrier_player(spawn: Vec2) -> impl Bundle {
+pub fn carrier_player(spec: &CarrierSpec) -> impl Bundle {
     (
-        player(spawn),
+        player(spec.spawn),
         Inventory::default(),
         Carrier,
         Capacity {
-            max_weight: Some(CARRIER_MAX_WEIGHT),
-            max_volume: Some(CARRIER_MAX_VOLUME),
+            max_weight: Some(spec.max_weight),
+            max_volume: Some(spec.max_volume),
         },
         Selectable,
         Selected,
@@ -37,8 +37,13 @@ mod tests {
 
     #[test]
     fn carrier_player_has_full_composition() {
+        let spec = CarrierSpec {
+            spawn: Vec2::ZERO,
+            max_weight: 2000.0,
+            max_volume: 3.0,
+        };
         let mut world = World::new();
-        let e = world.spawn(carrier_player(Vec2::ZERO)).id();
+        let e = world.spawn(carrier_player(&spec)).id();
 
         assert!(world.get::<Inventory>(e).is_some());
         assert!(world.get::<Carrier>(e).is_some());

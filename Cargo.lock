@@ -2841,7 +2841,9 @@ dependencies = [
  "motion",
  "obstacle",
  "player",
+ "ron 0.8.1",
  "selection",
+ "serde",
  "sprites",
  "world",
 ]

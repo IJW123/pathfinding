@@ -1,0 +1,37 @@
+// Authored starting level. Loaded by `level::objects::loader` into `LevelSpec` and spawned by
+// `spawn_level`. Positions/sizes are world units; rotations are radians (z-axis). Edit and restart
+// to retune — no recompile.
+(
+    // Half the square map's side (full map = 2 * this per axis, origin-centered). Single source of
+    // truth: drives the boundary walls and the terrain's extent.
+    map_half_extent: 2000.0,
+    // Procedural elevation recipe consumed by `world`'s engine, plus hand-placed features.
+    terrain: (
+        seed: 0x5EED1234,
+        hills:     (count: 36, radius_min: 120.0, radius_max: 280.0, height_min: 18.0, height_max: 45.0),
+        mountains: (count: 6,  radius_min: 350.0, radius_max: 600.0, height_min: 70.0, height_max: 100.0),
+        authored: [
+            (center: (0.0, 0.0),     radius: 220.0, height: 40.0),
+            (center: (-900.0, 700.0), radius: 500.0, height: 95.0),
+        ],
+    ),
+    obstacles: [
+        (shape: Circle,   pos: (250.0, 0.0),    rotation: 0.0, size: 60.0, pushable: false),
+        // Tilted to exercise rotated collision (0.6 rad ≈ 34°).
+        (shape: Triangle, pos: (280.0, 160.0),  rotation: 0.6, size: 75.0, pushable: false),
+        (shape: Quad,     pos: (150.0, -260.0), rotation: 0.0, size: 74.0, pushable: true),
+        (shape: Pentagon, pos: (320.0, -200.0), rotation: 0.0, size: 65.0, pushable: true),
+    ],
+    storage: (
+        pos: (-250.0, 200.0),
+        half_extent: 50.0,
+        max_volume: 20.0,
+        dock_radius: 120.0,
+        stock: [(Grain, 100), (Coal, 40), (Lumber, 60), (IronOre, 20)],
+    ),
+    carrier: (
+        spawn: (0.0, 0.0),
+        max_weight: 2000.0,
+        max_volume: 3.0,
+    ),
+)
