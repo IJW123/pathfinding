@@ -12,3 +12,4 @@ world = { workspace = true }
 player = { workspace = true }
 selection = { workspace = true }
 motion = { workspace = true }
+sprites = { workspace = true }

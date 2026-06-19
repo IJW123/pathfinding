@@ -4,6 +4,7 @@ use bevy::prelude::*;
 
 use hitboxes_rapier::components::{Collider, Static};
 use obstacle::components::{Obstacle, Wall};
+use sprites::components::SpriteRef;
 
 use crate::obstacle::constants::{
     OBSTACLE_DYNAMIC_COLOR, OBSTACLE_STATIC_COLOR, OBSTACLE_WALL_COLOR,
@@ -44,7 +45,7 @@ fn attach_obstacle_mesh(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    query: Query<ObstacleRender, Added<Obstacle>>,
+    query: Query<ObstacleRender, (Added<Obstacle>, Without<SpriteRef>)>,
 ) {
     for item in &query {
         let color = obstacle_color(item.is_wall.is_some(), item.is_static.is_some());

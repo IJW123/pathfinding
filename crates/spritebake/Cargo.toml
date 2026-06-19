@@ -1,0 +1,12 @@
+[package]
+name = "spritebake"
+version.workspace = true
+edition.workspace = true
+
+# Offline asset-bake tool: reads sprite PNGs and emits the hull manifest the runtime reads.
+# Build-time only — deliberately depends on no runtime crate and no bevy, so it stays out of the
+# game's dependency graph.
+[dependencies]
+image = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }

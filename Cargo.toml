@@ -14,6 +14,8 @@ members = [
     "crates/hud",
     "crates/render",
     "crates/motion",
+    "crates/sprites",
+    "crates/spritebake",
 ]
 
 [workspace.package]
@@ -34,10 +36,14 @@ bevy = { version = "0.18", default-features = false, features = [
     "webgl2",
     "x11",
     "sysinfo_plugin",
+    "png",
 ] }
 smallvec = { version = "1" }
 rapier2d = { version = "0.33" }
 parry2d = { version = "0.28" }
+image = { version = "0.25", default-features = false, features = ["png"] }
+serde = { version = "1", features = ["derive"] }
+ron = { version = "0.8" }
 
 camera_main = { path = "crates/camera_main" }
 collision_rapier = { path = "crates/collision_rapier" }
@@ -51,6 +57,7 @@ selection = { path = "crates/selection" }
 hud = { path = "crates/hud" }
 render = { path = "crates/render" }
 motion = { path = "crates/motion" }
+sprites = { path = "crates/sprites" }
 
 [profile.dev]
 opt-level = 1

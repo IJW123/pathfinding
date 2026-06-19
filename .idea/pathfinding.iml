@@ -21,6 +21,8 @@
       <sourceFolder url="file://$MODULE_DIR$/crates/logistics/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/obstacle/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/selection/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/spritebake/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/sprites/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -20,18 +20,8 @@ pub const PENTAGON_SIZE: f32 = 65.0;
 
 /// Storage building half-extent (square, world units). Like the obstacle sizes above, size is the
 /// level-side knob — the `infrastructure` crate owns the square silhouette, level picks how big.
+/// (Capacity/docking magnitudes live in `objects::constants`, with the composition that uses them.)
 pub const STORAGE_HALF_EXTENT: f32 = 50.0;
-
-// --- Capacity + docking knobs (logistics owns the model; level sets the magnitudes) ---
-/// Storage holds by space only (it's on the ground); m³. Above its starting stock so the seed is
-/// valid but deposits still cap.
-pub const STORAGE_MAX_VOLUME: f32 = 20.0;
-/// Circular load/unload range around the storage (world units), drawn around its ~50-unit body.
-pub const STORAGE_DOCK_RADIUS: f32 = 120.0;
-/// The player carries cargo: capped on both axes so hauling a full building clamps (shows partial
-/// fill). Weight in kg, volume in m³.
-pub const CARRIER_MAX_WEIGHT: f32 = 2000.0;
-pub const CARRIER_MAX_VOLUME: f32 = 3.0;
 
 // --- Procedural feature populations (count + radius/height ranges) ---
 /// Small, common hills.

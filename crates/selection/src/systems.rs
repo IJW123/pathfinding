@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Collider;
+use hitboxes_rapier::components::{Collider, Static};
 use hitboxes_rapier::convert::{transform_to_pose, vec2_to_parry};
 use world::elevation::height_field::HeightField;
 use world::terrain_effects::slope_speed::slope_speed_multiplier;
@@ -63,11 +63,15 @@ pub fn select_on_click(
 /// Arrow keys move the [`Selected`] entity, slowed/sped by terrain slope. Generalized from the old
 /// `move_player`: control is now whatever is selected. Runs before collision so the per-tick step
 /// stays bounded (no tunneling). Writes `Transform` only.
+///
+/// `Static` entities are excluded: an immovable building can be selected (for readouts) but can't be
+/// driven — the collision solver never corrects a static body, so driving one would phase it through
+/// walls and other statics.
 pub fn move_selected(
     time: Res<Time>,
     keyboard: Res<ButtonInput<KeyCode>>,
     height: Res<HeightField>,
-    mut query: Query<&mut Transform, With<Selected>>,
+    mut query: Query<&mut Transform, (With<Selected>, Without<Static>)>,
 ) {
     let mut direction = Vec2::ZERO;
     if keyboard.pressed(KeyCode::ArrowUp) {

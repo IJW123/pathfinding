@@ -5,6 +5,7 @@ use bevy::sprite_render::AlphaMode2d;
 use hitboxes_rapier::components::Collider;
 use logistics::cargo_handling::components::DockZone;
 use logistics::components::Storage;
+use sprites::components::SpriteRef;
 
 use crate::logistics::constants::{DOCK_ZONE_COLOR, DOCK_ZONE_Z_OFFSET, STORAGE_COLOR};
 use crate::obstacle::mesh::shape_mesh;
@@ -17,13 +18,17 @@ impl Plugin for StorageRenderPlugin {
     }
 }
 
+/// Newly-added storage that isn't skinned by a sprite — those get the procedural square mesh.
+/// Aliased to keep the query type under clippy's complexity bar.
+type UntexturedStorage = (Added<Storage>, Without<SpriteRef>);
+
 /// Give each newly-added storage building a square mesh (from its collider geometry) and the storage
 /// material. One-shot at spawn — mirrors `attach_obstacle_mesh`, reusing its `shape_mesh`.
 fn attach_storage_mesh(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    query: Query<(Entity, &Collider), Added<Storage>>,
+    query: Query<(Entity, &Collider), UntexturedStorage>,
 ) {
     for (entity, collider) in &query {
         let mesh = meshes.add(shape_mesh(&collider.shape));

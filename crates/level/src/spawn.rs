@@ -1,25 +1,21 @@
 use bevy::prelude::*;
 
-use logistics::bundle::storage_building;
-use logistics::cargo_handling::components::{Carrier, DockZone};
 use logistics::commodity::Commodity;
-use logistics::components::{Capacity, Inventory};
+use logistics::components::Inventory;
 use logistics::constants::STORAGE_Z;
-use motion::components::{MeasuredVelocity, PrevPosition};
 use obstacle::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
 use obstacle::constants::{OBSTACLE_Z, WALL_THICKNESS};
 use obstacle::shape::{circle, pentagon, quad, triangle};
-use player::bundle::player;
-use selection::components::{Selectable, Selected};
 
 use crate::constants::{
-    CARRIER_MAX_VOLUME, CARRIER_MAX_WEIGHT, CIRCLE_RADIUS, MAP_HALF_EXTENT, PENTAGON_SIZE,
-    QUAD_SIZE, STORAGE_DOCK_RADIUS, STORAGE_HALF_EXTENT, STORAGE_MAX_VOLUME, TRIANGLE_SIZE,
+    CIRCLE_RADIUS, MAP_HALF_EXTENT, PENTAGON_SIZE, QUAD_SIZE, STORAGE_HALF_EXTENT, TRIANGLE_SIZE,
 };
+use crate::objects::player::carrier_player;
+use crate::objects::storage::storage;
 
 /// The single place the starting world is populated. This fn *is* the level layout: per-instance
-/// position (`Transform`) and size live here, while the silhouette of each shape lives with its
-/// kind in the `obstacle` crate.
+/// position (`Transform`) and size live here, while each object's full component composition lives
+/// with its constructor in [`crate::objects`].
 pub fn spawn_level(mut commands: Commands) {
     for wall in boundary_walls(MAP_HALF_EXTENT, WALL_THICKNESS) {
         commands.spawn(wall);
@@ -46,46 +42,18 @@ pub fn spawn_level(mut commands: Commands) {
         pentagon(PENTAGON_SIZE),
     ));
 
-    // Storage building (infrastructure): a square holding a starting stock of goods. Capped by
-    // space only, with a circular dock zone a carrier must enter to load/unload.
-    let storage_pos = Vec2::new(-250.0, 200.0);
-    commands
-        .spawn(storage_building(
-            Transform::from_xyz(storage_pos.x, storage_pos.y, STORAGE_Z),
-            Vec2::splat(STORAGE_HALF_EXTENT),
-            Inventory::from_stock([
-                (Commodity::Grain, 100),
-                (Commodity::Coal, 40),
-                (Commodity::Lumber, 60),
-                (Commodity::IronOre, 20),
-            ]),
-        ))
-        .insert((
-            Capacity {
-                max_weight: None,
-                max_volume: Some(STORAGE_MAX_VOLUME),
-            },
-            DockZone {
-                radius: STORAGE_DOCK_RADIUS,
-            },
-            Selectable,
-            // Velocity readout for when this is the selected (controlled) entity. PrevPosition is
-            // seeded to spawn so the first measured tick isn't a spike.
-            MeasuredVelocity::default(),
-            PrevPosition(storage_pos),
-        ));
-
-    // Player doubles as the cargo carrier for now: an empty inventory capped on both weight and
-    // volume, so hauling a full building clamps.
-    commands.spawn(player(Vec2::ZERO)).insert((
-        Inventory::default(),
-        Carrier,
-        Capacity {
-            max_weight: Some(CARRIER_MAX_WEIGHT),
-            max_volume: Some(CARRIER_MAX_VOLUME),
-        },
-        // Player is just another selectable, controlled by default until the user picks something else.
-        Selectable,
-        Selected,
+    // Storage building (infrastructure): a square holding a starting stock of goods.
+    commands.spawn(storage(
+        Transform::from_xyz(-250.0, 200.0, STORAGE_Z),
+        STORAGE_HALF_EXTENT,
+        Inventory::from_stock([
+            (Commodity::Grain, 100),
+            (Commodity::Coal, 40),
+            (Commodity::Lumber, 60),
+            (Commodity::IronOre, 20),
+        ]),
     ));
+
+    // Player doubles as the cargo carrier, controlled by default.
+    commands.spawn(carrier_player(Vec2::ZERO));
 }

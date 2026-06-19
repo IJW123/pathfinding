@@ -11,3 +11,4 @@ obstacle = { workspace = true }
 world = { workspace = true }
 player = { workspace = true }
 selection = { workspace = true }
+sprites = { workspace = true }

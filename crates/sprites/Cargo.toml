@@ -1,0 +1,13 @@
+[package]
+name = "sprites"
+version.workspace = true
+edition.workspace = true
+
+# World-logic side of the sprite pipeline: loads the baked hull manifest and turns it into
+# colliders. Owns the SpriteId/SpriteRef vocabulary shared with render. Does NOT load images —
+# that's render's job (the PNG is a render asset).
+[dependencies]
+bevy = { workspace = true }
+hitboxes_rapier = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }

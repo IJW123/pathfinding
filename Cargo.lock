@@ -286,6 +286,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
+name = "base64"
+version = "0.21.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
+
+[[package]]
 name = "bevy"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -339,7 +345,7 @@ dependencies = [
  "downcast-rs",
  "either",
  "petgraph",
- "ron",
+ "ron 0.12.1",
  "serde",
  "smallvec",
  "thiserror 2.0.18",
@@ -436,7 +442,7 @@ dependencies = [
  "futures-lite",
  "futures-util",
  "js-sys",
- "ron",
+ "ron 0.12.1",
  "serde",
  "stackfuture",
  "thiserror 2.0.18",
@@ -2836,6 +2842,7 @@ dependencies = [
  "obstacle",
  "player",
  "selection",
+ "sprites",
  "world",
 ]
 
@@ -3608,6 +3615,7 @@ dependencies = [
  "motion",
  "render",
  "selection",
+ "sprites",
  "world",
 ]
 
@@ -4011,6 +4019,7 @@ dependencies = [
  "obstacle",
  "player",
  "selection",
+ "sprites",
  "world",
 ]
 
@@ -4025,6 +4034,18 @@ name = "robust"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4e27ee8bb91ca0adcf0ecb116293afa12d393f9c2b9b9cd54d33e8078fe19839"
+
+[[package]]
+name = "ron"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b91f7eff05f748767f183df4320a63d6936e9c6107d97c9e6bdd9784f4289c94"
+dependencies = [
+ "base64",
+ "bitflags 2.11.1",
+ "serde",
+ "serde_derive",
+]
 
 [[package]]
 name = "ron"
@@ -4316,6 +4337,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eda41003dc44290527a59b13432d4a0379379fa074b70174882adfbdfd917844"
 dependencies = [
  "bitflags 2.11.1",
+]
+
+[[package]]
+name = "spritebake"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "ron 0.8.1",
+ "serde",
+]
+
+[[package]]
+name = "sprites"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "hitboxes_rapier",
+ "ron 0.8.1",
+ "serde",
 ]
 
 [[package]]

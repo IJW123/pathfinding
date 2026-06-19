@@ -18,3 +18,4 @@ selection = { workspace = true }
 hud = { workspace = true }
 render = { workspace = true }
 motion = { workspace = true }
+sprites = { workspace = true }
