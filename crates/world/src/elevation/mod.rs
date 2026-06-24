@@ -6,3 +6,4 @@ pub mod generation;
 pub mod height_field;
 pub mod noise;
 pub mod plugin;
+mod sampler;

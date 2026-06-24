@@ -15,8 +15,12 @@ world = { workspace = true }
 logistics = { workspace = true }
 level = { workspace = true }
 rail = { workspace = true }
+routing = { workspace = true }
 selection = { workspace = true }
 hud = { workspace = true }
 render = { workspace = true }
 motion = { workspace = true }
 sprites = { workspace = true }
+
+[dev-dependencies]
+ron = { workspace = true }

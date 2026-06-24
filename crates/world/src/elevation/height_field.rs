@@ -1,4 +1,4 @@
-use bevy::math::{UVec2, Vec2};
+use bevy::math::{Rect, UVec2, Vec2};
 use bevy::prelude::Resource;
 
 use crate::elevation::config::TerrainConfig;
@@ -92,6 +92,15 @@ impl HeightField {
         }
     }
 
+    /// World-space extent spanned by the grid nodes: from `origin` to the far node
+    /// `origin + (dims - 1) * cell`. The sampled region, for callers (e.g. pathfinding) that need to
+    /// stay on terrain the field actually covers.
+    #[must_use]
+    pub fn bounds(&self) -> Rect {
+        let far = self.origin + (self.dims - UVec2::ONE).as_vec2() * self.cell;
+        Rect::from_corners(self.origin, far)
+    }
+
     /// Central-difference gradient of the height field (world units per world unit).
     #[must_use]
     pub fn gradient(&self, pos: Vec2) -> Vec2 {
@@ -158,5 +167,13 @@ mod tests {
         let f = HeightField::from_parts(UVec2::splat(3), Vec2::ZERO, 10.0, vec![5.0; 9]);
         let g = f.gradient(Vec2::new(10.0, 10.0));
         assert!(approx(g.x, 0.0) && approx(g.y, 0.0));
+    }
+
+    #[test]
+    fn bounds_span_the_grid_nodes() {
+        // 5x5 field, cell 10, origin (0,0) ⇒ far node at (40, 40).
+        let b = ramp_x().bounds();
+        assert!(b.min.distance(Vec2::ZERO) < EPS);
+        assert!(b.max.distance(Vec2::new(40.0, 40.0)) < EPS);
     }
 }

@@ -1,0 +1,12 @@
+[package]
+name = "routing"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Workspace `bevy` pulls in render/winit/ui features this leaf never uses; we only need
+# `Vec2`/`IVec2`/`Rect`. We still take the workspace dep (rather than a bare `bevy_math`/`glam`
+# line) so our `Vec2` is byte-identical to the one `RailTrack::new` consumes — no version skew
+# on the shared geometry type.
+bevy = { workspace = true }
+pathfinding = { workspace = true }

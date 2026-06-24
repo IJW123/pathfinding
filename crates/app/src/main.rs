@@ -12,6 +12,9 @@ use selection::plugin::SelectionPlugin;
 use sprites::plugin::SpritesPlugin;
 use world::elevation::plugin::ElevationPlugin;
 
+mod warehouse_link;
+use warehouse_link::WarehouseLinkPlugin;
+
 fn main() {
     App::new()
         // Assets live at the workspace-root `assets/`, but bevy resolves its asset root against the
@@ -33,6 +36,7 @@ fn main() {
             RailPlugin,
             HudPlugin,
             RenderPlugin,
+            WarehouseLinkPlugin,
         ))
         .configure_sets(FixedUpdate, MotionSet.after(CollisionSet))
         .run();
