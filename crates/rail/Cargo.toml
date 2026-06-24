@@ -1,0 +1,9 @@
+[package]
+name = "rail"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+hitboxes_rapier = { workspace = true }
+selection = { workspace = true }

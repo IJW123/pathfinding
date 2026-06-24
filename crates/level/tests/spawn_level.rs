@@ -9,11 +9,14 @@ use bevy::prelude::*;
 
 use hitboxes_rapier::components::Static;
 use level::objects::manifest::ObstacleShape;
-use level::objects::spec::{CarrierSpec, LevelSpec, ObstacleSpec, StorageSpec, TerrainSpec};
+use level::objects::spec::{
+    CarrierSpec, LevelSpec, ObstacleSpec, RailSpec, StorageSpec, TerrainSpec,
+};
 use level::plugin::LevelPlugin;
 use logistics::commodity::Commodity;
 use obstacle::components::{Obstacle, Wall};
 use player::components::Player;
+use rail::components::{Locomotive, RailHeading};
 use world::elevation::config::FeaturePopulation;
 
 /// The asserted topology: 4 interior obstacles (2 pushable), one storage, one carrier. Walls are
@@ -78,6 +81,15 @@ fn sample_level() -> LevelSpec {
             max_weight: 2000.0,
             max_volume: 3.0,
         },
+        rail: RailSpec {
+            points: vec![
+                Vec2::new(-600.0, -400.0),
+                Vec2::new(-200.0, -400.0),
+                Vec2::new(200.0, -150.0),
+            ],
+            start: 0.0,
+            heading: RailHeading::Forward,
+        },
     }
 }
 
@@ -100,6 +112,11 @@ fn spawns_expected_counts() {
         "4 interior obstacles + 4 walls (walls are obstacles)"
     );
     assert_eq!(world.query::<&Player>().iter(world).count(), 1, "1 player");
+    assert_eq!(
+        world.query::<&Locomotive>().iter(world).count(),
+        1,
+        "1 locomotive"
+    );
 }
 
 #[test]

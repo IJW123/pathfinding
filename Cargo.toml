@@ -10,6 +10,7 @@ members = [
     "crates/logistics",
     "crates/obstacle",
     "crates/player",
+    "crates/rail",
     "crates/selection",
     "crates/hud",
     "crates/render",
@@ -53,6 +54,7 @@ world = { path = "crates/world" }
 logistics = { path = "crates/logistics" }
 obstacle = { path = "crates/obstacle" }
 player = { path = "crates/player" }
+rail = { path = "crates/rail" }
 selection = { path = "crates/selection" }
 hud = { path = "crates/hud" }
 render = { path = "crates/render" }

@@ -33,6 +33,29 @@ impl Inventory {
         inventory
     }
 
+    /// Build an inventory from `(commodity, count)` pairs, clamping each against `cap` as the running
+    /// total grows. Returns the inventory plus any rejected overflow `(commodity, dropped)`, so an
+    /// over-cap seed is impossible to construct yet authoring mistakes still surface. Capping routes
+    /// through [`Capacity::grantable`] — the same path the transfer/haul systems use — so seeding and
+    /// depositing honour the caps identically. Like the haul path, the shared weight/volume budget is
+    /// consumed in pair order: an earlier commodity eats headroom a later one then sees gone.
+    #[must_use]
+    pub fn from_stock_capped(
+        cap: &Capacity,
+        stock: impl IntoIterator<Item = (Commodity, u32)>,
+    ) -> (Self, Vec<(Commodity, u32)>) {
+        let mut inventory = Self::default();
+        let mut overflow = Vec::new();
+        for (commodity, amount) in stock {
+            let granted = cap.grantable(&inventory, commodity, amount);
+            inventory.add(commodity, granted);
+            if granted < amount {
+                overflow.push((commodity, amount - granted));
+            }
+        }
+        (inventory, overflow)
+    }
+
     #[must_use]
     pub fn amount(&self, commodity: Commodity) -> u32 {
         self.counts[commodity as usize]
@@ -154,6 +177,45 @@ mod tests {
             4.0 * Commodity::Grain.unit_volume() + 2.0 * Commodity::IronOre.unit_volume();
         assert!((inv.total_weight() - expected_weight).abs() < f32::EPSILON);
         assert!((inv.total_volume() - expected_volume).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn from_stock_capped_under_cap_seeds_full_no_overflow() {
+        let cap = Capacity {
+            max_weight: None,
+            max_volume: Some(100.0),
+        };
+        let (inv, overflow) = Inventory::from_stock_capped(&cap, [(Commodity::Grain, 5)]);
+        assert_eq!(inv.amount(Commodity::Grain), 5);
+        assert!(overflow.is_empty());
+    }
+
+    #[test]
+    fn from_stock_capped_clamps_and_reports_overflow() {
+        // 100 kg cap, grain weighs 25/unit → 4 fit, ask for 10 → 6 overflow.
+        let cap = Capacity {
+            max_weight: Some(100.0),
+            max_volume: None,
+        };
+        let (inv, overflow) = Inventory::from_stock_capped(&cap, [(Commodity::Grain, 10)]);
+        assert_eq!(inv.amount(Commodity::Grain), 4);
+        assert_eq!(overflow, vec![(Commodity::Grain, 6)]);
+    }
+
+    #[test]
+    fn from_stock_capped_tracks_running_total_across_pairs() {
+        // 300 kg cap. Grain (25/unit) seeded first: 10 = 250 kg, no overflow. Coal (30/unit) then
+        // sees 50 kg headroom → 1 fits, the other 9 overflow. Proves the clamp follows the running
+        // total, not each pair in isolation.
+        let cap = Capacity {
+            max_weight: Some(300.0),
+            max_volume: None,
+        };
+        let (inv, overflow) =
+            Inventory::from_stock_capped(&cap, [(Commodity::Grain, 10), (Commodity::Coal, 10)]);
+        assert_eq!(inv.amount(Commodity::Grain), 10);
+        assert_eq!(inv.amount(Commodity::Coal), 1);
+        assert_eq!(overflow, vec![(Commodity::Coal, 9)]);
     }
 
     #[test]

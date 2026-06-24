@@ -34,4 +34,18 @@
         max_weight: 2000.0,
         max_volume: 3.0,
     ),
+    // Rail track + its single locomotive. `points` is a coarse polyline; `rail` smooths the corners
+    // into a curve the loco follows. `start` is the loco's initial arc-length along the track;
+    // `heading` its initial travel direction. Placeholder layout — a pathfinder will author this later.
+    rail: (
+        points: [
+            (-600.0, -400.0),
+            (-200.0, -400.0),
+            (200.0, -150.0),
+            (600.0, -150.0),
+            (800.0, 200.0),
+        ],
+        start: 0.0,
+        heading: Forward,
+    ),
 )

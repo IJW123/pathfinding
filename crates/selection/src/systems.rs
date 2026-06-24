@@ -7,7 +7,7 @@ use hitboxes_rapier::convert::{transform_to_pose, vec2_to_parry};
 use world::elevation::height_field::HeightField;
 use world::terrain_effects::slope_speed::slope_speed_multiplier;
 
-use crate::components::{Selectable, Selected};
+use crate::components::{FreeMoveExempt, Selectable, Selected};
 use crate::constants::CONTROL_SPEED;
 
 /// Left-click picks the topmost [`Selectable`] under the cursor and makes it the sole [`Selected`]
@@ -64,14 +64,20 @@ pub fn select_on_click(
 /// `move_player`: control is now whatever is selected. Runs before collision so the per-tick step
 /// stays bounded (no tunneling). Writes `Transform` only.
 ///
+/// What free arrow-key control applies to: a `Selected` entity that is neither `Static` nor
+/// `FreeMoveExempt`. Factored into an alias to keep `move_selected`'s signature readable (and past
+/// clippy's `type_complexity` gate), mirroring `collision_rapier`'s `MovedStatics`.
+type FreeMovable = (With<Selected>, Without<Static>, Without<FreeMoveExempt>);
+
 /// `Static` entities are excluded: an immovable building can be selected (for readouts) but can't be
 /// driven — the collision solver never corrects a static body, so driving one would phase it through
-/// walls and other statics.
+/// walls and other statics. `FreeMoveExempt` entities are excluded too: they're `Selected` but
+/// driven by their own controller (e.g. a rail locomotive), so free xy motion would fight it.
 pub fn move_selected(
     time: Res<Time>,
     keyboard: Res<ButtonInput<KeyCode>>,
     height: Res<HeightField>,
-    mut query: Query<&mut Transform, (With<Selected>, Without<Static>)>,
+    mut query: Query<&mut Transform, FreeMovable>,
 ) {
     let mut direction = Vec2::ZERO;
     if keyboard.pressed(KeyCode::ArrowUp) {

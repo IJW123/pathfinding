@@ -26,16 +26,17 @@ use crate::objects::spec::StorageSpec;
 #[must_use]
 pub fn storage(spec: &StorageSpec) -> impl Bundle {
     let transform = Transform::from_xyz(spec.pos.x, spec.pos.y, STORAGE_Z);
+    let capacity = Capacity {
+        max_weight: None,
+        max_volume: Some(spec.max_volume),
+    };
+    let (inventory, overflow) = Inventory::from_stock_capped(&capacity, spec.stock.iter().copied());
+    for (commodity, dropped) in overflow {
+        warn!(?commodity, dropped, ?spec.pos, "storage seed exceeds volume cap; clamped");
+    }
     (
-        storage_building(
-            transform,
-            Vec2::splat(spec.half_extent),
-            Inventory::from_stock(spec.stock.iter().copied()),
-        ),
-        Capacity {
-            max_weight: None,
-            max_volume: Some(spec.max_volume),
-        },
+        storage_building(transform, Vec2::splat(spec.half_extent), inventory),
+        capacity,
         DockZone {
             radius: spec.dock_radius,
         },
@@ -77,6 +78,31 @@ mod tests {
             world.get::<PrevPosition>(e).expect("seeded").0,
             spec.pos,
             "PrevPosition seeded to spawn"
+        );
+    }
+
+    #[test]
+    fn over_cap_stock_is_clamped_to_volume() {
+        // 20 m³ holds ~615 grain (0.0325 m³/unit); 1000 overshoots → seed must clamp at-or-under cap.
+        let spec = StorageSpec {
+            pos: Vec2::ZERO,
+            half_extent: 50.0,
+            max_volume: 20.0,
+            dock_radius: 120.0,
+            stock: vec![(Commodity::Grain, 1000)],
+        };
+        let mut world = World::new();
+        let e = world.spawn(storage(&spec)).id();
+        let inv = world.get::<Inventory>(e).expect("seeded inventory");
+
+        assert!(
+            inv.total_volume() <= spec.max_volume + f32::EPSILON,
+            "seed clamped to volume cap, got {} m³",
+            inv.total_volume()
+        );
+        assert!(
+            inv.amount(Commodity::Grain) > 0,
+            "clamp leaves what fits, not nothing"
         );
     }
 }

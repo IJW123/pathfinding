@@ -4,6 +4,7 @@ use crate::elevation::plugin::ContourRenderPlugin;
 use crate::logistics::plugin::StorageRenderPlugin;
 use crate::obstacle::plugin::ObstacleRenderPlugin;
 use crate::player::plugin::PlayerRenderPlugin;
+use crate::rail::plugin::RailRenderPlugin;
 use crate::selection::plugin::SelectionRenderPlugin;
 use crate::sprite::plugin::SpriteTexturePlugin;
 
@@ -16,6 +17,7 @@ impl Plugin for RenderPlugin {
             ObstacleRenderPlugin,
             StorageRenderPlugin,
             PlayerRenderPlugin,
+            RailRenderPlugin,
             SelectionRenderPlugin,
             SpriteTexturePlugin,
         ));

@@ -9,6 +9,7 @@ use bevy::math::Vec2;
 use serde::Deserialize;
 
 use logistics::commodity::Commodity;
+use rail::components::RailHeading;
 use world::elevation::config::FeaturePopulation;
 use world::elevation::generation::feature::FeatureSpec;
 
@@ -21,6 +22,38 @@ pub struct RawLevelSpec {
     pub obstacles: Vec<RawObstacleSpec>,
     pub storage: RawStorageSpec,
     pub carrier: RawCarrierSpec,
+    pub rail: RawRailSpec,
+}
+
+/// The rail track and its single locomotive. `points` is the coarse authored polyline (smoothed into
+/// a curve by `rail`); `start` is the loco's initial arc-length; `heading` its initial travel
+/// direction. Scaffolding: a future pathfinder produces these points instead of hand-authoring.
+#[derive(Deserialize)]
+pub struct RawRailSpec {
+    pub points: Vec<(f32, f32)>,
+    pub start: f32,
+    pub heading: RawHeading,
+}
+
+/// Wire mirror of `rail`'s [`RailHeading`] (keeps `rail` serde-free). Map via
+/// [`RawHeading::to_heading`].
+#[derive(Deserialize, Clone, Copy)]
+pub enum RawHeading {
+    Forward,
+    Backward,
+}
+
+impl RawHeading {
+    /// Map to the domain [`RailHeading`]. Inherent method, not `From` — `RailHeading` is foreign to
+    /// `level` (the `Self` type), so the orphan rule forbids the impl (same as
+    /// [`RawCommodity::to_commodity`]).
+    #[must_use]
+    pub fn to_heading(self) -> RailHeading {
+        match self {
+            Self::Forward => RailHeading::Forward,
+            Self::Backward => RailHeading::Backward,
+        }
+    }
 }
 
 /// The procedural terrain recipe. Mirrors `world`'s `TerrainConfig` minus `half_extent` (that comes

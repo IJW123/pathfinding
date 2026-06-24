@@ -4,6 +4,8 @@ use hitboxes_rapier::components::Collider;
 use obstacle::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
 use obstacle::constants::{OBSTACLE_Z, WALL_THICKNESS};
 use obstacle::shape::{circle, pentagon, quad, triangle};
+use rail::bundle::{locomotive, rail_track};
+use rail::track::RailTrack;
 
 use crate::objects::manifest::ObstacleShape;
 use crate::objects::player::carrier_player;
@@ -32,6 +34,12 @@ pub fn spawn_level(mut commands: Commands, level: Res<LevelSpec>) {
 
     commands.spawn(storage(&level.storage));
     commands.spawn(carrier_player(&level.carrier));
+
+    // The track owns its smoothed geometry; the loco starts on it. Build the track first so the
+    // loco's initial pose can be sampled off it, then hand the track to its own entity.
+    let track = RailTrack::new(level.rail.points.clone());
+    commands.spawn(locomotive(&track, level.rail.start, level.rail.heading));
+    commands.spawn(rail_track(track));
 }
 
 /// The collider for an obstacle's silhouette, scaled to its authored size. The `obstacle` crate

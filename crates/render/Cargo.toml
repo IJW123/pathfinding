@@ -10,5 +10,6 @@ logistics = { workspace = true }
 obstacle = { workspace = true }
 world = { workspace = true }
 player = { workspace = true }
+rail = { workspace = true }
 selection = { workspace = true }
 sprites = { workspace = true }

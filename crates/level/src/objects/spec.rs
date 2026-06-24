@@ -6,12 +6,13 @@
 use bevy::prelude::*;
 
 use logistics::commodity::Commodity;
+use rail::components::RailHeading;
 use world::elevation::config::{FeaturePopulation, TerrainConfig};
 use world::elevation::generation::feature::FeatureSpec;
 
 use crate::objects::manifest::{
-    ObstacleShape, RawCarrierSpec, RawFeatureSpec, RawLevelSpec, RawObstacleSpec, RawStorageSpec,
-    RawTerrainSpec,
+    ObstacleShape, RawCarrierSpec, RawFeatureSpec, RawLevelSpec, RawObstacleSpec, RawRailSpec,
+    RawStorageSpec, RawTerrainSpec,
 };
 
 /// The whole authored level — map size, terrain recipe, and every spawned object — loaded once at
@@ -25,6 +26,7 @@ pub struct LevelSpec {
     pub obstacles: Vec<ObstacleSpec>,
     pub storage: StorageSpec,
     pub carrier: CarrierSpec,
+    pub rail: RailSpec,
 }
 
 /// The procedural terrain recipe, in `world`'s own types. `half_extent` is not stored here — it's
@@ -78,6 +80,15 @@ pub struct CarrierSpec {
     pub max_volume: f32,
 }
 
+/// The rail track and its locomotive: a coarse `points` polyline (smoothed by `rail` into a curved
+/// track), the loco's initial arc-length `start`, and its initial `heading`. The constructor
+/// `RailTrack::new` is the durable seam — a future pathfinder feeds the same `points`.
+pub struct RailSpec {
+    pub points: Vec<Vec2>,
+    pub start: f32,
+    pub heading: RailHeading,
+}
+
 impl From<RawLevelSpec> for LevelSpec {
     fn from(raw: RawLevelSpec) -> Self {
         Self {
@@ -86,6 +97,21 @@ impl From<RawLevelSpec> for LevelSpec {
             obstacles: raw.obstacles.into_iter().map(ObstacleSpec::from).collect(),
             storage: raw.storage.into(),
             carrier: raw.carrier.into(),
+            rail: raw.rail.into(),
+        }
+    }
+}
+
+impl From<RawRailSpec> for RailSpec {
+    fn from(raw: RawRailSpec) -> Self {
+        Self {
+            points: raw
+                .points
+                .into_iter()
+                .map(|(x, y)| Vec2::new(x, y))
+                .collect(),
+            start: raw.start,
+            heading: raw.heading.to_heading(),
         }
     }
 }
@@ -169,6 +195,8 @@ mod tests {
             storage: (pos: (-250.0, 200.0), half_extent: 50.0, max_volume: 20.0, dock_radius: 120.0,
                       stock: [(Grain, 100), (Coal, 40)]),
             carrier: (spawn: (0.0, 0.0), max_weight: 2000.0, max_volume: 3.0),
+            rail: (points: [(-600.0, -400.0), (-200.0, -400.0), (200.0, -150.0)],
+                   start: 0.0, heading: Backward),
         )"#;
 
         let raw: RawLevelSpec = ron::from_str(text).expect("valid level RON");
@@ -188,6 +216,12 @@ mod tests {
             vec![(Commodity::Grain, 100), (Commodity::Coal, 40)]
         );
         assert_eq!(spec.carrier.max_weight, 2000.0);
+
+        // Rail: tuple points become `Vec2`s and the wire heading maps to the domain enum.
+        assert_eq!(spec.rail.points.len(), 3);
+        assert_eq!(spec.rail.points[0], Vec2::new(-600.0, -400.0));
+        assert_eq!(spec.rail.start, 0.0);
+        assert_eq!(spec.rail.heading, RailHeading::Backward);
 
         // The shared map size becomes the terrain's half_extent.
         assert_eq!(spec.terrain_config().half_extent, 2000.0);
