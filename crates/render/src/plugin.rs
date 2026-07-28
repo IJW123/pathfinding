@@ -5,8 +5,10 @@ use crate::logistics::plugin::StorageRenderPlugin;
 use crate::obstacle::plugin::ObstacleRenderPlugin;
 use crate::player::plugin::PlayerRenderPlugin;
 use crate::rail::plugin::RailRenderPlugin;
+use crate::range::plugin::RangeRingRenderPlugin;
 use crate::selection::plugin::SelectionRenderPlugin;
 use crate::sprite::plugin::SpriteTexturePlugin;
+use crate::station::plugin::StationRenderPlugin;
 
 pub struct RenderPlugin;
 
@@ -18,6 +20,8 @@ impl Plugin for RenderPlugin {
             StorageRenderPlugin,
             PlayerRenderPlugin,
             RailRenderPlugin,
+            StationRenderPlugin,
+            RangeRingRenderPlugin,
             SelectionRenderPlugin,
             SpriteTexturePlugin,
         ));

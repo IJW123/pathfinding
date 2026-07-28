@@ -4,13 +4,20 @@ use bevy::prelude::*;
 
 use selection::components::{FreeMoveExempt, Selectable};
 
-/// The single rail-bound locomotive. Selectable like any unit, but `FreeMoveExempt` so the generic
-/// arrow-key mover skips it — its only motion comes from [`drive_locomotive`](crate::systems) along
-/// the track. Both required components are parameter-free, so the constructor only inserts the
-/// parameterized pieces (collider, track position, heading, transform).
+/// A rail-bound locomotive. Selectable like any unit, but `FreeMoveExempt` so the generic arrow-key
+/// mover skips it — its only motion comes from [`drive_locomotive`](crate::systems) along the track
+/// named by its [`OnTrack`]. Several can coexist, one per track. Both required components are
+/// parameter-free, so the constructor only inserts the parameterized pieces (track ref, collider,
+/// track position, heading, transform).
 #[derive(Component)]
 #[require(Selectable, FreeMoveExempt)]
 pub struct Locomotive;
+
+/// The track entity this locomotive rides. The drive/project systems resolve the
+/// [`RailTrack`](crate::track::RailTrack) by this id, so tracks and locomotives are many independent
+/// pairs rather than one global track — what makes multiple rail lines possible.
+#[derive(Component, Debug, Clone, Copy)]
+pub struct OnTrack(pub Entity);
 
 /// Arc-length position of the locomotive along its [`RailTrack`](crate::track::RailTrack), in world
 /// units from the track's start. The loco's *only* degree of freedom — world `Transform` is derived

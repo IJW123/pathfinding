@@ -22,30 +22,35 @@
         (shape: Quad,     pos: (150.0, -260.0), rotation: 0.0, size: 74.0, pushable: true),
         (shape: Pentagon, pos: (320.0, -200.0), rotation: 0.0, size: 65.0, pushable: true),
     ],
-    storage: (
-        pos: (-250.0, 200.0),
-        half_extent: 50.0,
-        max_volume: 20.0,
-        dock_radius: 120.0,
-        stock: [(Grain, 100), (Coal, 40), (Lumber, 60), (IronOre, 20)],
-    ),
+    // Warehouses. Stations are not authored: a rail terminal with a warehouse within STATION_RADIUS
+    // derives a station at that terminal; a rail ending near no warehouse gets none. Place a
+    // warehouse near a rail end to make it rail-served.
+    storages: [
+        // Source warehouse at the rail's start terminal, seeded with goods to haul.
+        (pos: (-600.0, -220.0), half_extent: 50.0, max_volume: 20.0,
+         stock: [(Grain, 100), (Coal, 40), (Lumber, 60), (IronOre, 20)]),
+        // Destination warehouse at the rail's end terminal, starts empty.
+        (pos: (800.0, 380.0), half_extent: 50.0, max_volume: 20.0, stock: []),
+    ],
     carrier: (
         spawn: (0.0, 0.0),
         max_weight: 2000.0,
         max_volume: 3.0,
     ),
-    // Rail track + its single locomotive. `points` is a coarse polyline; `rail` smooths the corners
-    // into a curve the loco follows. `start` is the loco's initial arc-length along the track;
-    // `heading` its initial travel direction. Placeholder layout — a pathfinder will author this later.
-    rail: (
-        points: [
-            (-600.0, -400.0),
-            (-200.0, -400.0),
-            (200.0, -150.0),
-            (600.0, -150.0),
-            (800.0, 200.0),
-        ],
-        start: 0.0,
-        heading: Forward,
-    ),
+    // Rail lines. Each is a coarse `points` polyline (`rail` smooths the corners into a curve), plus
+    // the cargo train riding it: `start` is the train's initial arc-length, `heading` its direction.
+    // Many lines may coexist — each train is bound to its own track.
+    rails: [
+        (
+            points: [
+                (-600.0, -400.0),
+                (-200.0, -400.0),
+                (200.0, -150.0),
+                (600.0, -150.0),
+                (800.0, 200.0),
+            ],
+            start: 0.0,
+            heading: Forward,
+        ),
+    ],
 )

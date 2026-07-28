@@ -4,5 +4,7 @@ pub mod obstacle;
 pub mod player;
 pub mod plugin;
 pub mod rail;
+pub mod range;
 pub mod selection;
 pub mod sprite;
+pub mod station;

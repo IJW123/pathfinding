@@ -2,20 +2,28 @@ use bevy::prelude::*;
 
 use hitboxes_rapier::components::Collider;
 
-use crate::components::{Locomotive, RailHeading, TrackPosition};
+use crate::components::{Locomotive, OnTrack, RailHeading, TrackPosition};
 use crate::constants::{LOCO_HALF_EXTENTS, LOCO_Z, TRACK_Z};
 use crate::track::RailTrack;
 
-/// The locomotive starting at arc-length `start_s` on `track`, facing `heading`. Its `Collider` is
-/// for click-picking only (the loco is never `Solid`, so the solver detects but never pushes it).
-/// The initial `Transform` is seeded from the track so it renders on-rail before the first
+/// The locomotive starting at arc-length `start_s` on `track` (entity `track_entity`), facing
+/// `heading`. The [`OnTrack`] ref is how the drive/project systems find this loco's track, so it
+/// must name the entity the matching [`rail_track`] is (or will be) spawned on. Its `Collider` is for
+/// click-picking only (the loco is never `Solid`, so the solver detects but never pushes it). The
+/// initial `Transform` is seeded from the track so it renders on-rail before the first
 /// `project_locomotive` tick.
 #[must_use]
-pub fn locomotive(track: &RailTrack, start_s: f32, heading: RailHeading) -> impl Bundle {
+pub fn locomotive(
+    track: &RailTrack,
+    track_entity: Entity,
+    start_s: f32,
+    heading: RailHeading,
+) -> impl Bundle {
     let pose = track.sample(start_s);
     let facing = pose.angle + heading.facing_offset();
     (
         Locomotive,
+        OnTrack(track_entity),
         Collider::obb(LOCO_HALF_EXTENTS),
         TrackPosition(start_s),
         heading,
@@ -48,11 +56,17 @@ mod tests {
     fn locomotive_has_full_composition_and_sits_on_rail() {
         let track = sample_track();
         let mut world = World::new();
+        let track_entity = Entity::PLACEHOLDER;
         let e = world
-            .spawn(locomotive(&track, 0.0, RailHeading::Forward))
+            .spawn(locomotive(&track, track_entity, 0.0, RailHeading::Forward))
             .id();
 
         assert!(world.get::<Locomotive>(e).is_some());
+        assert_eq!(
+            world.get::<OnTrack>(e).expect("on-track ref").0,
+            track_entity,
+            "loco references the track it was spawned for"
+        );
         assert!(world.get::<Collider>(e).is_some(), "collider for picking");
         assert_eq!(world.get::<TrackPosition>(e).expect("seeded").0, 0.0);
         assert_eq!(

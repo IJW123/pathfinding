@@ -17,6 +17,7 @@ use logistics::commodity::Commodity;
 use obstacle::components::{Obstacle, Wall};
 use player::components::Player;
 use rail::components::{Locomotive, RailHeading};
+use station::components::Station;
 use world::elevation::config::FeaturePopulation;
 
 /// The asserted topology: 4 interior obstacles (2 pushable), one storage, one carrier. Walls are
@@ -69,19 +70,18 @@ fn sample_level() -> LevelSpec {
                 pushable: true,
             },
         ],
-        storage: StorageSpec {
+        storages: vec![StorageSpec {
             pos: Vec2::new(-250.0, 200.0),
             half_extent: 50.0,
             max_volume: 20.0,
-            dock_radius: 120.0,
             stock: vec![(Commodity::Grain, 100)],
-        },
+        }],
         carrier: CarrierSpec {
             spawn: Vec2::ZERO,
             max_weight: 2000.0,
             max_volume: 3.0,
         },
-        rail: RailSpec {
+        rails: vec![RailSpec {
             points: vec![
                 Vec2::new(-600.0, -400.0),
                 Vec2::new(-200.0, -400.0),
@@ -89,7 +89,7 @@ fn sample_level() -> LevelSpec {
             ],
             start: 0.0,
             heading: RailHeading::Forward,
-        },
+        }],
     }
 }
 
@@ -117,6 +117,15 @@ fn spawns_expected_counts() {
         1,
         "1 locomotive"
     );
+}
+
+#[test]
+fn no_stations_when_storage_is_far_from_rail_terminals() {
+    // Stations are derived at rail terminals with a warehouse in reach. This level's sole storage
+    // is ~570+ units from both terminals — well past `STATION_RADIUS` — so none may spawn.
+    let mut app = run_level();
+    let world = app.world_mut();
+    assert_eq!(world.query::<&Station>().iter(world).count(), 0);
 }
 
 #[test]

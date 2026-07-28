@@ -11,6 +11,7 @@ obstacle = { workspace = true }
 world = { workspace = true }
 player = { workspace = true }
 rail = { workspace = true }
+station = { workspace = true }
 selection = { workspace = true }
 motion = { workspace = true }
 sprites = { workspace = true }

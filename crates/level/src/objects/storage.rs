@@ -1,10 +1,9 @@
 //! Storage building composition: a square `Storage` plus everything the level wires onto it —
-//! capacity, a dock zone, the warehouse sprite, selection, and a velocity readout.
+//! capacity, the warehouse sprite, selection, and a velocity readout.
 
 use bevy::prelude::*;
 
 use logistics::bundle::storage_building;
-use logistics::cargo_handling::components::DockZone;
 use logistics::components::{Capacity, Inventory};
 use logistics::constants::STORAGE_Z;
 use motion::components::{MeasuredVelocity, PrevPosition};
@@ -14,9 +13,9 @@ use sprites::components::{SpriteId, SpriteRef};
 use crate::objects::spec::StorageSpec;
 
 /// A storage building from `spec`. Returns the complete entity: the `storage_building` bundle plus
-/// the level's composition — capacity capped by volume only, a circular dock zone a carrier must
-/// enter, the warehouse sprite, selection, and a velocity readout for when this is the controlled
-/// entity.
+/// the level's composition — capacity capped by volume only, the warehouse sprite, selection, and a
+/// velocity readout for when this is the controlled entity. Cargo moves only via a station in range;
+/// the warehouse has no zone of its own.
 ///
 /// `STORAGE_Z` (per-kind render ordering) is applied here; the spec carries `pos` only. `Storage`
 /// only requires `Solid`, so `MeasuredVelocity`/`PrevPosition` are added by hand (not free via
@@ -37,9 +36,6 @@ pub fn storage(spec: &StorageSpec) -> impl Bundle {
     (
         storage_building(transform, Vec2::splat(spec.half_extent), inventory),
         capacity,
-        DockZone {
-            radius: spec.dock_radius,
-        },
         // The warehouse sprite skins the existing square collider (full side = 2 * half-extent); the
         // OBB collider is unchanged.
         SpriteRef {
@@ -63,14 +59,12 @@ mod tests {
             pos: Vec2::new(-250.0, 200.0),
             half_extent: 50.0,
             max_volume: 20.0,
-            dock_radius: 120.0,
             stock: vec![(Commodity::Grain, 100)],
         };
         let mut world = World::new();
         let e = world.spawn(storage(&spec)).id();
 
         assert!(world.get::<Capacity>(e).is_some());
-        assert!(world.get::<DockZone>(e).is_some());
         assert!(world.get::<SpriteRef>(e).is_some());
         assert!(world.get::<Selectable>(e).is_some());
         assert!(world.get::<MeasuredVelocity>(e).is_some());
@@ -88,7 +82,6 @@ mod tests {
             pos: Vec2::ZERO,
             half_extent: 50.0,
             max_volume: 20.0,
-            dock_radius: 120.0,
             stock: vec![(Commodity::Grain, 1000)],
         };
         let mut world = World::new();

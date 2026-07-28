@@ -1,13 +1,19 @@
 use bevy::prelude::*;
 
 use hitboxes_rapier::components::Collider;
+use logistics::components::Capacity;
 use obstacle::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
 use obstacle::constants::{OBSTACLE_Z, WALL_THICKNESS};
 use obstacle::shape::{circle, pentagon, quad, triangle};
+use rail::spawn::spawn_rail_line;
+use rail::track::RailTrack;
+use station::bundle::cargo_train;
+use station::constants::{TRAIN_MAX_VOLUME, TRAIN_MAX_WEIGHT};
 
 use crate::objects::manifest::ObstacleShape;
 use crate::objects::player::carrier_player;
 use crate::objects::spec::{LevelSpec, ObstacleSpec};
+use crate::objects::station::terminal_stations;
 use crate::objects::storage::storage;
 
 /// The single place the starting world is populated, from the authored [`LevelSpec`]. Per-instance
@@ -30,13 +36,36 @@ pub fn spawn_level(mut commands: Commands, level: Res<LevelSpec>) {
         }
     }
 
-    commands.spawn(storage(&level.storage));
+    for spec in &level.storages {
+        commands.spawn(storage(spec));
+    }
+
     commands.spawn(carrier_player(&level.carrier));
 
-    // The authored `rail` placeholder is no longer spawned here: the routed rail (app's
-    // `WarehouseLinkPlugin`) is now the world's single track, and `rail`'s `Single<&RailTrack>`
-    // driver assumes exactly one. `level.rail` stays parsed but dormant until rail gains per-loco
-    // track association.
+    // Each authored rail line: a track plus the cargo train riding it. `spawn_rail_line` owns the
+    // borrow-vs-move spawn ordering and binds the loco to its own track via `OnTrack`; we then turn
+    // that loco into a cargo train so the station broker can load/unload it. Stations are derived,
+    // not authored: each track terminal with a warehouse in reach earns one — placed while the
+    // track is still borrowable, before `spawn_rail_line` consumes it.
+    let storage_positions: Vec<Vec2> = level.storages.iter().map(|spec| spec.pos).collect();
+    for spec in &level.rails {
+        let track = RailTrack::new(spec.points.clone());
+        for bundle in terminal_stations(&track, &storage_positions) {
+            commands.spawn(bundle);
+        }
+        let line = spawn_rail_line(&mut commands, track, spec.start, spec.heading);
+        commands
+            .entity(line.loco)
+            .insert(cargo_train(train_capacity()));
+    }
+}
+
+/// The hold limits of an authored rail train, from the `station` crate's per-kind constants.
+fn train_capacity() -> Capacity {
+    Capacity {
+        max_weight: Some(TRAIN_MAX_WEIGHT),
+        max_volume: Some(TRAIN_MAX_VOLUME),
+    }
 }
 
 /// The collider for an obstacle's silhouette, scaled to its authored size. The `obstacle` crate

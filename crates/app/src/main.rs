@@ -10,10 +10,8 @@ use rail::plugin::RailPlugin;
 use render::plugin::RenderPlugin;
 use selection::plugin::SelectionPlugin;
 use sprites::plugin::SpritesPlugin;
+use station::plugin::StationPlugin;
 use world::elevation::plugin::ElevationPlugin;
-
-mod warehouse_link;
-use warehouse_link::WarehouseLinkPlugin;
 
 fn main() {
     App::new()
@@ -34,9 +32,9 @@ fn main() {
             SpritesPlugin,
             LevelPlugin,
             RailPlugin,
+            StationPlugin,
             HudPlugin,
             RenderPlugin,
-            WarehouseLinkPlugin,
         ))
         .configure_sets(FixedUpdate, MotionSet.after(CollisionSet))
         .run();

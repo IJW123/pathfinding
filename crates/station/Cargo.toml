@@ -1,0 +1,10 @@
+[package]
+name = "station"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+range = { workspace = true }
+logistics = { workspace = true }
+selection = { workspace = true }

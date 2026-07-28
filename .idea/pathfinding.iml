@@ -24,8 +24,12 @@
       <sourceFolder url="file://$MODULE_DIR$/crates/spritebake/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/sprites/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/rail/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/rail/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/range/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/routing/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/routing/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/station/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/station/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

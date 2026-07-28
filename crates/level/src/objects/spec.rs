@@ -24,9 +24,9 @@ pub struct LevelSpec {
     pub map_half_extent: f32,
     pub terrain: TerrainSpec,
     pub obstacles: Vec<ObstacleSpec>,
-    pub storage: StorageSpec,
+    pub storages: Vec<StorageSpec>,
     pub carrier: CarrierSpec,
-    pub rail: RailSpec,
+    pub rails: Vec<RailSpec>,
 }
 
 /// The procedural terrain recipe, in `world`'s own types. `half_extent` is not stored here — it's
@@ -63,13 +63,13 @@ pub struct ObstacleSpec {
     pub pushable: bool,
 }
 
-/// The storage building: square of `half_extent`, capped by `max_volume`, with a `dock_radius`
-/// load/unload zone and a starting `stock`.
+/// The storage building: square of `half_extent`, capped by `max_volume`, with a starting `stock`.
+/// Cargo moves in and out only via a station whose radius covers it — warehouses have no zone of
+/// their own.
 pub struct StorageSpec {
     pub pos: Vec2,
     pub half_extent: f32,
     pub max_volume: f32,
-    pub dock_radius: f32,
     pub stock: Vec<(Commodity, u32)>,
 }
 
@@ -80,9 +80,9 @@ pub struct CarrierSpec {
     pub max_volume: f32,
 }
 
-/// The rail track and its locomotive: a coarse `points` polyline (smoothed by `rail` into a curved
-/// track), the loco's initial arc-length `start`, and its initial `heading`. The constructor
-/// `RailTrack::new` is the durable seam — a future pathfinder feeds the same `points`.
+/// One rail line: a coarse `points` polyline (smoothed by `rail` into a curved track), the cargo
+/// train's initial arc-length `start`, and its initial `heading`. The constructor `RailTrack::new`
+/// is the durable seam — a future pathfinder feeds the same `points`.
 pub struct RailSpec {
     pub points: Vec<Vec2>,
     pub start: f32,
@@ -95,9 +95,9 @@ impl From<RawLevelSpec> for LevelSpec {
             map_half_extent: raw.map_half_extent,
             terrain: raw.terrain.into(),
             obstacles: raw.obstacles.into_iter().map(ObstacleSpec::from).collect(),
-            storage: raw.storage.into(),
+            storages: raw.storages.into_iter().map(StorageSpec::from).collect(),
             carrier: raw.carrier.into(),
-            rail: raw.rail.into(),
+            rails: raw.rails.into_iter().map(RailSpec::from).collect(),
         }
     }
 }
@@ -152,7 +152,6 @@ impl From<RawStorageSpec> for StorageSpec {
             pos: Vec2::new(raw.pos.0, raw.pos.1),
             half_extent: raw.half_extent,
             max_volume: raw.max_volume,
-            dock_radius: raw.dock_radius,
             stock: raw
                 .stock
                 .into_iter()
@@ -192,11 +191,15 @@ mod tests {
                 (shape: Circle, pos: (250.0, 0.0), rotation: 0.0, size: 60.0, pushable: false),
                 (shape: Quad, pos: (150.0, -260.0), rotation: 0.5, size: 74.0, pushable: true),
             ],
-            storage: (pos: (-250.0, 200.0), half_extent: 50.0, max_volume: 20.0, dock_radius: 120.0,
-                      stock: [(Grain, 100), (Coal, 40)]),
+            storages: [
+                (pos: (-250.0, 200.0), half_extent: 50.0, max_volume: 20.0,
+                 stock: [(Grain, 100), (Coal, 40)]),
+            ],
             carrier: (spawn: (0.0, 0.0), max_weight: 2000.0, max_volume: 3.0),
-            rail: (points: [(-600.0, -400.0), (-200.0, -400.0), (200.0, -150.0)],
-                   start: 0.0, heading: Backward),
+            rails: [
+                (points: [(-600.0, -400.0), (-200.0, -400.0), (200.0, -150.0)],
+                 start: 0.0, heading: Backward),
+            ],
         )"#;
 
         let raw: RawLevelSpec = ron::from_str(text).expect("valid level RON");
@@ -212,16 +215,16 @@ mod tests {
         assert!(spec.obstacles[1].pushable);
         assert_eq!(spec.obstacles[1].rotation, 0.5);
         assert_eq!(
-            spec.storage.stock,
+            spec.storages[0].stock,
             vec![(Commodity::Grain, 100), (Commodity::Coal, 40)]
         );
         assert_eq!(spec.carrier.max_weight, 2000.0);
 
         // Rail: tuple points become `Vec2`s and the wire heading maps to the domain enum.
-        assert_eq!(spec.rail.points.len(), 3);
-        assert_eq!(spec.rail.points[0], Vec2::new(-600.0, -400.0));
-        assert_eq!(spec.rail.start, 0.0);
-        assert_eq!(spec.rail.heading, RailHeading::Backward);
+        assert_eq!(spec.rails[0].points.len(), 3);
+        assert_eq!(spec.rails[0].points[0], Vec2::new(-600.0, -400.0));
+        assert_eq!(spec.rails[0].start, 0.0);
+        assert_eq!(spec.rails[0].heading, RailHeading::Backward);
 
         // The shared map size becomes the terrain's half_extent.
         assert_eq!(spec.terrain_config().half_extent, 2000.0);

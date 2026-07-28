@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 
-use crate::cargo_handling::components::{Carrier, DockZone};
 use crate::cargo_handling::message::CargoHaul;
 use crate::commodity::Commodity;
-use crate::components::{Capacity, Inventory, Storage};
+use crate::components::{Capacity, Inventory};
 
 /// Apply [`CargoHaul`]s: per commodity, move `min(available at source, grantable at dest)`, so the
 /// dest never breaches its caps and the unmoved remainder stays in the source. Grantable is
@@ -28,45 +27,6 @@ pub fn apply_cargo_hauls(
                 dest_capacity.map_or(available, |c| c.grantable(&dest, commodity, available));
             let moved = source.remove(commodity, grant);
             dest.add(commodity, moved);
-        }
-    }
-}
-
-/// Keyboard docking: `9` loads everything from the nearest in-range storage into the carrier, `0`
-/// unloads the carrier back into it. A storage is in range when the carrier sits within its
-/// [`DockZone`]. Placeholder input — a real order/UI replaces it later.
-pub fn dock_haul_input(
-    keyboard: Res<ButtonInput<KeyCode>>,
-    carriers: Query<(Entity, &Transform), With<Carrier>>,
-    zones: Query<(Entity, &Transform, &DockZone), With<Storage>>,
-    mut hauls: MessageWriter<CargoHaul>,
-) {
-    let load = keyboard.just_pressed(KeyCode::Digit9);
-    let unload = keyboard.just_pressed(KeyCode::Digit0);
-    if load || unload {
-        for (carrier, carrier_tf) in &carriers {
-            let here = carrier_tf.translation.xy();
-            let nearest = zones
-                .iter()
-                .map(|(storage, tf, zone)| {
-                    (storage, here.distance(tf.translation.xy()), zone.radius)
-                })
-                .filter(|(_, dist, radius)| dist <= radius)
-                .min_by(|a, b| a.1.total_cmp(&b.1));
-            if let Some((storage, _, _)) = nearest {
-                let haul = if load {
-                    CargoHaul {
-                        source: storage,
-                        dest: carrier,
-                    }
-                } else {
-                    CargoHaul {
-                        source: carrier,
-                        dest: storage,
-                    }
-                };
-                hauls.write(haul);
-            }
         }
     }
 }

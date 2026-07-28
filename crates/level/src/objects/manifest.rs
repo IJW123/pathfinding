@@ -20,14 +20,14 @@ pub struct RawLevelSpec {
     pub map_half_extent: f32,
     pub terrain: RawTerrainSpec,
     pub obstacles: Vec<RawObstacleSpec>,
-    pub storage: RawStorageSpec,
+    pub storages: Vec<RawStorageSpec>,
     pub carrier: RawCarrierSpec,
-    pub rail: RawRailSpec,
+    pub rails: Vec<RawRailSpec>,
 }
 
-/// The rail track and its single locomotive. `points` is the coarse authored polyline (smoothed into
-/// a curve by `rail`); `start` is the loco's initial arc-length; `heading` its initial travel
-/// direction. Scaffolding: a future pathfinder produces these points instead of hand-authoring.
+/// One rail line: a track plus the cargo train riding it. `points` is the coarse authored polyline
+/// (smoothed into a curve by `rail`); `start` is the train's initial arc-length; `heading` its
+/// initial travel direction. Many lines may coexist — each loco is bound to its own track.
 #[derive(Deserialize)]
 pub struct RawRailSpec {
     pub points: Vec<(f32, f32)>,
@@ -139,7 +139,6 @@ pub struct RawStorageSpec {
     pub pos: (f32, f32),
     pub half_extent: f32,
     pub max_volume: f32,
-    pub dock_radius: f32,
     pub stock: Vec<(RawCommodity, u32)>,
 }
 
