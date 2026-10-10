@@ -10,6 +10,9 @@ pub const SCALE_BAR_HEIGHT_PX: f32 = 4.0;
 /// Padding from the window edges for HUD elements, in logical px.
 pub const HUD_MARGIN_PX: f32 = 8.0;
 
+/// Vertical gap between the scale bar's label and its fill bar, in logical px.
+pub const SCALE_BAR_ROW_GAP_PX: f32 = 2.0;
+
 pub const HUD_FONT_SIZE: f32 = 18.0;
 
 pub const HUD_TEXT_COLOR: Color = Color::srgb(0.95, 0.95, 0.95);

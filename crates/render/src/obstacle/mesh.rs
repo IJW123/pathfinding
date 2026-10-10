@@ -1,7 +1,7 @@
 use bevy::asset::RenderAssetUsages;
 use bevy::math::Vec2;
-use bevy::math::primitives::{Circle, Rectangle};
 use bevy::mesh::{Indices, Mesh, PrimitiveTopology};
+use bevy::shape::{Circle, Rectangle};
 
 use hitboxes::shape::ColliderShape;
 

@@ -1,4 +1,5 @@
-Add: 
+Add:
+- editor to allow manual placement of objects
 - Different terrain features
 - right now hitbox is used by render to render, this needs to be improved
 ~~- SAT Collision detection~~
@@ -11,5 +12,5 @@ Add:
   - Ownership system of these structures
 - Currency system
 - Market system
-
+- 
 hq

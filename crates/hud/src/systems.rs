@@ -2,63 +2,11 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use crate::components::{HudReadout, ScaleBarFill, ScaleBarLabel};
-use crate::constants::{
-    HUD_FONT_SIZE, HUD_MARGIN_PX, HUD_TEXT_COLOR, SCALE_BAR_COLOR, SCALE_BAR_HEIGHT_PX,
-    TARGET_BAR_PX,
-};
+use crate::constants::TARGET_BAR_PX;
 use crate::format::{format_distance, nice_distance};
 use measurement::motion::components::MeasuredVelocity;
 use selection::components::Selected;
 use world::elevation::height_field::HeightField;
-
-pub fn spawn_hud(mut commands: Commands) {
-    commands.spawn((
-        Text::new("x: 0 m  y: 0 m\nz: 0.0 m\nspeed: 0.0 m/s"),
-        TextFont {
-            font_size: HUD_FONT_SIZE,
-            ..default()
-        },
-        TextColor(HUD_TEXT_COLOR),
-        Node {
-            position_type: PositionType::Absolute,
-            top: Val::Px(HUD_MARGIN_PX),
-            right: Val::Px(HUD_MARGIN_PX),
-            ..default()
-        },
-        HudReadout,
-    ));
-
-    commands
-        .spawn(Node {
-            position_type: PositionType::Absolute,
-            bottom: Val::Px(HUD_MARGIN_PX),
-            left: Val::Px(HUD_MARGIN_PX),
-            flex_direction: FlexDirection::Column,
-            align_items: AlignItems::FlexStart,
-            row_gap: Val::Px(2.0),
-            ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn((
-                Text::new("0 m"),
-                TextFont {
-                    font_size: HUD_FONT_SIZE,
-                    ..default()
-                },
-                TextColor(HUD_TEXT_COLOR),
-                ScaleBarLabel,
-            ));
-            parent.spawn((
-                Node {
-                    width: Val::Px(TARGET_BAR_PX),
-                    height: Val::Px(SCALE_BAR_HEIGHT_PX),
-                    ..default()
-                },
-                BackgroundColor(SCALE_BAR_COLOR),
-                ScaleBarFill,
-            ));
-        });
-}
 
 pub fn update_hud_text(
     height: Res<HeightField>,

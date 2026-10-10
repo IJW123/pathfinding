@@ -27,11 +27,12 @@ edition = "2024"
 version = "0.1.0"
 
 [workspace.dependencies]
-bevy = { version = "0.18", default-features = false, features = [
+bevy = { version = "0.20", default-features = false, features = [
     "default_app",
     "2d_bevy_render",
     "bevy_ui",
     "bevy_ui_render",
+    "bevy_scene",
     "std",
     "bevy_gilrs",
     "bevy_winit",
