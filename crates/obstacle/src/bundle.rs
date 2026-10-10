@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::{Collider, Static};
+use hitboxes::components::{Collider, Static};
 
 use crate::components::{Obstacle, Wall};
 use crate::constants::WALL_Z;
@@ -59,7 +59,7 @@ pub fn boundary_walls(half_extent: f32, thickness: f32) -> [impl Bundle; 4] {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hitboxes_rapier::components::Solid;
+    use hitboxes::components::Solid;
 
     fn spawn(bundle: impl Bundle) -> (World, Entity) {
         let mut world = World::new();

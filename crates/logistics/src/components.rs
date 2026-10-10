@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Solid;
+use hitboxes::components::Solid;
 
 use crate::commodity::{Commodity, CommodityChange};
 

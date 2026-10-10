@@ -19,5 +19,5 @@ station = { workspace = true }
 selection = { workspace = true }
 hud = { workspace = true }
 render = { workspace = true }
-motion = { workspace = true }
+measurement = { workspace = true }
 sprites = { workspace = true }

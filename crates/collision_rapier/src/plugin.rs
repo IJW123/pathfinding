@@ -37,7 +37,7 @@ mod tests {
     use super::*;
     use crate::mapping::BodyBinding;
     use bevy::ecs::message::Messages;
-    use hitboxes_rapier::components::{Collider, Solid, Static};
+    use hitboxes::components::{Collider, Solid, Static};
 
     fn app() -> App {
         let mut app = App::new();

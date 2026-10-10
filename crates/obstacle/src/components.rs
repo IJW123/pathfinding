@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Solid;
+use hitboxes::components::Solid;
 
 /// Marker for placed obstacle entities. Render keys off it via `Added<Obstacle>`.
 ///

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::components::{MeasuredVelocity, PrevPosition};
+use super::components::{MeasuredVelocity, PrevPosition};
 
 pub fn measure_velocity(
     time: Res<Time>,

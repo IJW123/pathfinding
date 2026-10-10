@@ -7,7 +7,7 @@ use crate::constants::{
     TARGET_BAR_PX,
 };
 use crate::format::{format_distance, nice_distance};
-use motion::components::MeasuredVelocity;
+use measurement::motion::components::MeasuredVelocity;
 use selection::components::Selected;
 use world::elevation::height_field::HeightField;
 

@@ -7,7 +7,7 @@
 
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Static;
+use hitboxes::components::Static;
 use level::objects::manifest::ObstacleShape;
 use level::objects::spec::{
     CarrierSpec, LevelSpec, ObstacleSpec, RailSpec, StorageSpec, TerrainSpec,

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Collider;
+use hitboxes::components::Collider;
 use logistics::components::Capacity;
 use obstacle::bundle::{boundary_walls, pushable_obstacle, static_obstacle};
 use obstacle::constants::{OBSTACLE_Z, WALL_THICKNESS};

@@ -5,7 +5,7 @@ edition.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-hitboxes_rapier = { workspace = true }
+hitboxes = { workspace = true }
 logistics = { workspace = true }
 obstacle = { workspace = true }
 world = { workspace = true }
@@ -13,7 +13,7 @@ player = { workspace = true }
 rail = { workspace = true }
 station = { workspace = true }
 selection = { workspace = true }
-motion = { workspace = true }
+measurement = { workspace = true }
 sprites = { workspace = true }
 serde = { workspace = true }
 ron = { workspace = true }

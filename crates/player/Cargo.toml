@@ -5,5 +5,5 @@ edition.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-hitboxes_rapier = { workspace = true }
-motion = { workspace = true }
+hitboxes = { workspace = true }
+measurement = { workspace = true }

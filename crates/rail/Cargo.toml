@@ -5,5 +5,5 @@ edition.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-hitboxes_rapier = { workspace = true }
+hitboxes = { workspace = true }
 selection = { workspace = true }

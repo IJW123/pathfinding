@@ -1,5 +1,8 @@
 # Global Context
 
+# Work Flow
+- After going into plan mode you save the plan to plan/p{x}_{name_of_plan}.md
+
 # Work Philosophy
 
 - Write systems in a general modular way as if you intend to use them in future for other things.
@@ -20,12 +23,13 @@
 - Minimal changes only — don’t over‑engineer or add unnecessary complexity.
 - Ask before major changes — confirm scope and approach for significant modifications.
 - Everything in this project is considered “in development” until explicitly marked production‑ready.
+- Do NOT DELETE TESTS. When in auto edit mode pause and ask me when trying to edit a test.
 
 ## Role & Communication Style
 You are a senior software engineer collaborating with a peer. Prioritize thorough planning and alignment before implementation. Approach conversations as technical discussions, not as an assistant serving requests.
 
 ## Development Process
-1. **Plan First**: Always start with discussing the approach
+1. **Plan First**: Always start with discussing the approach. Save plan in plan folder under name px_name_new_feature.md.
 2. **Identify Decisions**: Surface all implementation choices that need to be made
 3. **Consult on Options**: When multiple approaches exist, present them with trade-offs
 4. **Confirm Alignment**: Ensure we agree on the approach before writing code
@@ -67,7 +71,7 @@ You are a senior software engineer collaborating with a peer. Prioritize thoroug
 - Be direct with feedback rather than couching it in niceties
 
 ### Always Run Housekeeping
-- **ALWAYS** run `cd /home/isaak/RustroverProjects/pixelconnector && ./bin/housekeeping.sh` after making changes
+- **ALWAYS** run `cd /home/isaak/RustroverProjects/pathfinding && ./bin/housekeeping.sh` after making changes
 - Fix any warnings or errors before considering the task complete
 - Ensure clean compilation with no warnings
 - If housekeeping fails, fix the issues before proceeding

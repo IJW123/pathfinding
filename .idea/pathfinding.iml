@@ -9,7 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/crates/render/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/world/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/crates/motion/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/measurement/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/camera_main/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/collision_rapier/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/crates/hitboxes/src" isTestSource="false" />

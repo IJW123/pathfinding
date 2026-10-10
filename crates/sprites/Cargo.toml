@@ -8,6 +8,6 @@ edition.workspace = true
 # that's render's job (the PNG is a render asset).
 [dependencies]
 bevy = { workspace = true }
-hitboxes_rapier = { workspace = true }
+hitboxes = { workspace = true }
 serde = { workspace = true }
 ron = { workspace = true }

@@ -4,7 +4,7 @@
 
 use bevy::math::Vec2;
 
-use hitboxes_rapier::components::Collider;
+use hitboxes::components::Collider;
 
 /// Unit triangle silhouette: circumradius 1.0, CCW, origin-centered.
 const TRIANGLE_UNIT: [Vec2; 3] = [

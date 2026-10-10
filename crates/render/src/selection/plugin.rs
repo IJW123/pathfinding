@@ -1,7 +1,7 @@
 use bevy::app::{App, Plugin, Update};
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Collider;
+use hitboxes::components::Collider;
 use selection::components::Selected;
 
 use crate::obstacle::mesh::shape_mesh;

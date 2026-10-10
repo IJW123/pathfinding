@@ -2,8 +2,8 @@ use std::cmp::Ordering;
 
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::{Collider, Static};
-use hitboxes_rapier::convert::{transform_to_pose, vec2_to_parry};
+use hitboxes::components::{Collider, Static};
+use hitboxes::convert::{transform_to_pose, vec2_to_parry};
 use world::elevation::height_field::HeightField;
 use world::terrain_effects::slope_speed::slope_speed_multiplier;
 

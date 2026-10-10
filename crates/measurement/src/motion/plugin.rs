@@ -1,13 +1,13 @@
 use bevy::prelude::*;
 
-use crate::systems::measure_velocity;
+use super::systems::measure_velocity;
 
 /// System set wrapping [`measure_velocity`]. Exists so consumers can order
 /// against it.
 ///
 /// # Scheduling contract
 ///
-/// `motion` is a leaf crate and cannot enforce this itself — the ordering
+/// `measurement` is a leaf crate and cannot enforce this itself — the ordering
 /// must be configured by the app that wires the plugins together:
 ///
 /// ```text
@@ -25,7 +25,7 @@ use crate::systems::measure_velocity;
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MotionSet;
 
-/// Measures [`MeasuredVelocity`](crate::components::MeasuredVelocity) from
+/// Measures [`MeasuredVelocity`](crate::motion::components::MeasuredVelocity) from
 /// `Transform` deltas each fixed tick. See [`MotionSet`] for the ordering
 /// the app must enforce.
 pub struct MotionPlugin;

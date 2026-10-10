@@ -6,7 +6,7 @@ use bevy::prelude::*;
 use logistics::bundle::storage_building;
 use logistics::components::{Capacity, Inventory};
 use logistics::constants::STORAGE_Z;
-use motion::components::{MeasuredVelocity, PrevPosition};
+use measurement::motion::components::{MeasuredVelocity, PrevPosition};
 use selection::components::Selectable;
 use sprites::components::{SpriteId, SpriteRef};
 

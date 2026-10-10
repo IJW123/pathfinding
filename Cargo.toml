@@ -4,7 +4,7 @@ members = [
     "crates/app",
     "crates/camera_main",
     "crates/collision_rapier",
-    "crates/hitboxes_rapier",
+    "crates/hitboxes",
     "crates/level",
     "crates/world",
     "crates/logistics",
@@ -17,7 +17,7 @@ members = [
     "crates/station",
     "crates/hud",
     "crates/render",
-    "crates/motion",
+    "crates/measurement",
     "crates/sprites",
     "crates/spritebake",
 ]
@@ -52,7 +52,7 @@ pathfinding = { version = "4" }
 
 camera_main = { path = "crates/camera_main" }
 collision_rapier = { path = "crates/collision_rapier" }
-hitboxes_rapier = { path = "crates/hitboxes_rapier" }
+hitboxes = { path = "crates/hitboxes" }
 level = { path = "crates/level" }
 world = { path = "crates/world" }
 logistics = { path = "crates/logistics" }
@@ -65,7 +65,7 @@ selection = { path = "crates/selection" }
 station = { path = "crates/station" }
 hud = { path = "crates/hud" }
 render = { path = "crates/render" }
-motion = { path = "crates/motion" }
+measurement = { path = "crates/measurement" }
 sprites = { path = "crates/sprites" }
 
 [profile.dev]

@@ -4,11 +4,11 @@ use bevy::prelude::*;
 /// the entity's `Transform` delta over the previous frame.
 ///
 /// This is *measured*, not requested: it folds in everything that mutated
-/// the `Transform` before [`MotionSet`](crate::plugin::MotionSet) ran —
+/// the `Transform` before [`MotionSet`](crate::motion::plugin::MotionSet) ran —
 /// player input, terrain-modified movement, collision push-out, and any
 /// scripted transform writes. It is **not** input/requested speed.
 ///
-/// Read-only output of [`MotionPlugin`](crate::plugin::MotionPlugin):
+/// Read-only output of [`MotionPlugin`](crate::motion::plugin::MotionPlugin):
 /// writes to this component are overwritten every frame.
 #[derive(Component, Default, Debug, Clone, Copy)]
 pub struct MeasuredVelocity(pub Vec2);

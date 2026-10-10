@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::{Collider, Static};
+use hitboxes::components::{Collider, Static};
 
 use crate::components::{Inventory, Storage};
 
@@ -27,7 +27,7 @@ pub fn storage_building(
 mod tests {
     use super::*;
     use crate::commodity::Commodity;
-    use hitboxes_rapier::components::Solid;
+    use hitboxes::components::Solid;
 
     #[test]
     fn storage_building_is_solid_static_with_inventory() {

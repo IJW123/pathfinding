@@ -5,8 +5,8 @@ use rapier2d::math::Pose;
 use rapier2d::parry::query;
 use rapier2d::parry::shape::SharedShape;
 
-use hitboxes_rapier::components::Solid;
-use hitboxes_rapier::convert::{parry_to_vec2, vec2_to_parry};
+use hitboxes::components::Solid;
+use hitboxes::convert::{parry_to_vec2, vec2_to_parry};
 
 use crate::constants::{
     COLLISION_EPSILON, PENETRATION_PERCENT, PENETRATION_SLOP, SOLVER_ITERATIONS,
@@ -366,8 +366,8 @@ pub fn resolve_collisions(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hitboxes_rapier::components::Collider;
-    use hitboxes_rapier::convert::transform_to_pose;
+    use hitboxes::components::Collider;
+    use hitboxes::convert::transform_to_pose;
     use rapier2d::parry::shape::{Ball, ConvexPolygon, Cuboid};
 
     /// Pins the assumption the whole solver rests on: parry's `Contact::normal1` points from

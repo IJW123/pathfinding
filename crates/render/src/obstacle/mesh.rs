@@ -3,7 +3,7 @@ use bevy::math::Vec2;
 use bevy::math::primitives::{Circle, Rectangle};
 use bevy::mesh::{Indices, Mesh, PrimitiveTopology};
 
-use hitboxes_rapier::shape::ColliderShape;
+use hitboxes::shape::ColliderShape;
 
 /// Visual mesh derived from collision geometry — single source of truth, so visuals can't drift
 /// from the collider. Analytic shapes go through bevy's primitive meshers; convex hulls are

@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use rapier2d::geometry::{ActiveCollisionTypes, ColliderBuilder};
 
-use hitboxes_rapier::components::{Collider, Static};
-use hitboxes_rapier::convert::transform_to_pose;
+use hitboxes::components::{Collider, Static};
+use hitboxes::convert::transform_to_pose;
 
 use crate::mapping::{BodyBinding, ColliderMap, entity_to_user_data};
 use crate::physics::PhysicsWorld;

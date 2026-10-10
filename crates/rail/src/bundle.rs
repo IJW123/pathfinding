@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Collider;
+use hitboxes::components::Collider;
 
 use crate::components::{Locomotive, OnTrack, RailHeading, TrackPosition};
 use crate::constants::{LOCO_HALF_EXTENTS, LOCO_Z, TRACK_Z};

@@ -2,7 +2,7 @@ use bevy::app::{App, Plugin, Update};
 use bevy::ecs::query::QueryData;
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::{Collider, Static};
+use hitboxes::components::{Collider, Static};
 use obstacle::components::{Obstacle, Wall};
 use sprites::components::SpriteRef;
 

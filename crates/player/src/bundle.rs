@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Collider;
-use motion::components::PrevPosition;
+use hitboxes::components::Collider;
+use measurement::motion::components::PrevPosition;
 
 use crate::components::Player;
 use crate::constants::{PLAYER_SIZE, PLAYER_Z};
@@ -21,8 +21,8 @@ pub fn player(spawn: Vec2) -> impl Bundle {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hitboxes_rapier::components::Solid;
-    use motion::components::MeasuredVelocity;
+    use hitboxes::components::Solid;
+    use measurement::motion::components::MeasuredVelocity;
 
     #[test]
     fn player_has_required_and_seeded_components() {

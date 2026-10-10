@@ -5,7 +5,7 @@ use collision_rapier::plugin::{CollisionPlugin, CollisionSet};
 use hud::plugin::HudPlugin;
 use level::plugin::LevelPlugin;
 use logistics::plugin::LogisticsPlugin;
-use motion::plugin::{MotionPlugin, MotionSet};
+use measurement::motion::plugin::{MotionPlugin, MotionSet};
 use rail::plugin::RailPlugin;
 use render::plugin::RenderPlugin;
 use selection::plugin::SelectionPlugin;

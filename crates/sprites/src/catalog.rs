@@ -4,8 +4,8 @@ use std::fmt::{self, Display, Formatter};
 
 use bevy::prelude::*;
 
-use hitboxes_rapier::components::Collider;
-use hitboxes_rapier::shape::DegenerateHullError;
+use hitboxes::components::Collider;
+use hitboxes::shape::DegenerateHullError;
 
 use crate::components::SpriteId;
 use crate::manifest::RawSpriteDef;
